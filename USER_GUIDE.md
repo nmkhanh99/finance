@@ -35,6 +35,7 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 2. Tạo mẫu: **Loại** (Thu/Chi/Chuyển), **Số tiền**, **Tần suất** (hằng ngày/tuần/tháng), **Tài khoản**, **Danh mục**, **Ngày bắt đầu**, và **Ngày kết thúc** (tuỳ chọn).
 3. Bấm **▶ Chạy ngay** để sinh các kỳ đã tới hạn (tự cộng/trừ số dư như giao dịch thường), hoặc đặt cron gọi `/api/recurring/run` để tự động.
 4. App tự "đuổi kịp" nhiều kỳ nếu lâu chưa chạy, và tự dừng khi quá ngày kết thúc.
+5. Mỗi mẫu có nút **Tạm dừng/Tiếp tục** (mẫu đang dừng sẽ không sinh giao dịch) và mục **Sửa** (đổi số tiền, tần suất, ngày kỳ tới, ngày kết thúc, ghi chú).
 
 > Mốc thời gian tính theo UTC (nhất quán toàn app) — với giờ VN, kỳ trong ngày sẽ sinh sau ~07:00 sáng.
 

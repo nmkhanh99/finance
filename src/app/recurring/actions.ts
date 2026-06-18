@@ -38,6 +38,36 @@ export async function createRecurring(formData: FormData) {
   revalidatePath("/recurring");
 }
 
+export async function toggleRecurring(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  const active = String(formData.get("active") ?? "") === "true";
+  if (!id) return;
+  await prisma.recurringTransaction.update({ where: { id }, data: { active } });
+  revalidatePath("/recurring");
+}
+
+export async function updateRecurring(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  const amount = Number(formData.get("amount") ?? 0);
+  const frequency = String(formData.get("frequency") ?? "MONTHLY") as RecurrenceFrequency;
+  const note = String(formData.get("note") ?? "").trim() || null;
+  const nextStr = String(formData.get("nextRun") ?? "");
+  const endStr = String(formData.get("endDate") ?? "");
+  if (!id || amount <= 0) return;
+
+  await prisma.recurringTransaction.update({
+    where: { id },
+    data: {
+      amount: new Prisma.Decimal(amount),
+      frequency,
+      note,
+      ...(nextStr ? { nextRun: new Date(nextStr) } : {}),
+      endDate: endStr ? new Date(endStr) : null,
+    },
+  });
+  revalidatePath("/recurring");
+}
+
 export async function deleteRecurring(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
