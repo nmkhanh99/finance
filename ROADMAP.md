@@ -11,6 +11,7 @@
 - Quản lý danh mục (CRUD) trong UI.
 - Ngân sách theo tháng + cảnh báo vượt.
 - Tìm kiếm & lọc giao dịch (ghi chú / loại / tài khoản / danh mục / tháng).
+- Export giao dịch ra CSV (theo bộ lọc).
 - Dockerize (Postgres + app + migrate) qua docker-compose.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
@@ -24,7 +25,7 @@
 - **Cron tự cập nhật giá** trong Docker (hiện cần gọi `/api/prices/refresh` thủ công).
 
 ## Later
-- Import CSV sao kê ngân hàng / Export báo cáo.
+- Import CSV sao kê ngân hàng (export đã có).
 - Đa tiền tệ (VND/USD) + tỷ giá.
 - Nhắc lịch trả nợ / đáo hạn (push/email).
 - Mở rộng danh sách mã crypto hỗ trợ / nhập `priceId` tùy chỉnh.

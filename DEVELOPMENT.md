@@ -31,6 +31,9 @@ src/
     db.ts               # Prisma Client singleton
     finance.ts          # công thức tài chính (Net Worth, P&L, lãi, FV, payoff)
     split.ts            # chia tiền nhóm + phương án thanh toán
+    budget.ts           # đánh giá ngân sách (spent vs limit)
+    txFilter.ts         # buildTransactionWhere — lọc giao dịch dùng chung
+    csv.ts              # xuất CSV an toàn (escape RFC 4180)
     format.ts           # format tiền/ngày (vi-VN)
     *.test.ts           # unit test (vitest)
 Dockerfile, docker-compose.yml, .dockerignore, .env.example, DOCKER.md

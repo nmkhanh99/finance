@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { formatMoney, formatDate } from "@/lib/format";
 import { createTransaction, deleteTransaction } from "./actions";
-import { Prisma, TransactionType } from "@prisma/client";
+import { buildTransactionWhere, type TxFilters } from "@/lib/txFilter";
 
 export const dynamic = "force-dynamic";
 
@@ -11,34 +11,17 @@ const TYPE_META: Record<string, { label: string; sign: string; color: string }> 
   TRANSFER: { label: "Chuyển", sign: "", color: "text-sky-400" },
 };
 
-interface Filters {
-  q?: string;
-  type?: string;
-  accountId?: string;
-  categoryId?: string;
-  month?: string; // YYYY-MM
-}
-
 export default async function TransactionsPage({
   searchParams,
 }: {
-  searchParams: Promise<Filters>;
+  searchParams: Promise<TxFilters>;
 }) {
   const f = await searchParams;
-
-  // Dựng điều kiện lọc
-  const where: Prisma.TransactionWhereInput = {};
-  if (f.q?.trim()) where.note = { contains: f.q.trim(), mode: "insensitive" };
-  if (f.type === "INCOME" || f.type === "EXPENSE" || f.type === "TRANSFER") {
-    where.type = f.type as TransactionType;
-  }
-  if (f.accountId) where.OR = [{ accountId: f.accountId }, { toAccountId: f.accountId }];
-  if (f.categoryId) where.categoryId = f.categoryId;
-  if (f.month && /^\d{4}-\d{2}$/.test(f.month)) {
-    const [y, m] = f.month.split("-").map(Number);
-    where.date = { gte: new Date(y, m - 1, 1), lt: new Date(y, m, 1) };
-  }
+  const where = buildTransactionWhere(f);
   const hasFilter = Object.keys(where).length > 0;
+  const exportQs = new URLSearchParams(
+    Object.entries(f).filter(([, v]) => v) as [string, string][],
+  ).toString();
 
   const [accounts, categories, transactions, agg] = await Promise.all([
     prisma.account.findMany({ orderBy: { name: "asc" } }),
@@ -194,9 +177,19 @@ export default async function TransactionsPage({
       </form>
 
       {/* Tổng kết kết quả */}
-      <div className="text-sm text-gray-400">
-        {resultCount} giao dịch{hasFilter ? " (đã lọc)" : ""} · tổng {formatMoney(resultSum)}
-        {resultCount > transactions.length ? ` · hiển thị ${transactions.length} mới nhất` : ""}
+      <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-400">
+        <span>
+          {resultCount} giao dịch{hasFilter ? " (đã lọc)" : ""} · tổng {formatMoney(resultSum)}
+          {resultCount > transactions.length ? ` · hiển thị ${transactions.length} mới nhất` : ""}
+        </span>
+        {resultCount > 0 && (
+          <a
+            href={`/api/transactions/export${exportQs ? `?${exportQs}` : ""}`}
+            className="rounded-lg border border-white/15 px-3 py-1.5 text-xs hover:bg-white/10"
+          >
+            ⬇ Xuất CSV
+          </a>
+        )}
       </div>
 
       <div className="space-y-2">
