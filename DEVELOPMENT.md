@@ -32,6 +32,7 @@ src/
     finance.ts          # công thức tài chính (Net Worth, P&L, lãi, FV, payoff)
     split.ts            # chia tiền nhóm + phương án thanh toán
     budget.ts           # đánh giá ngân sách (spent vs limit)
+    auth.ts             # ký/verify cookie phiên HMAC (Web Crypto), kiểm mật khẩu
     networth.ts         # computeNetWorth + recordNetWorthSnapshot (Dashboard tái dùng)
     txCore.ts           # applyTransaction — tạo giao dịch + cập nhật số dư (dùng chung)
     recurring.ts        # nextOccurrence (tần suất, pure)
@@ -131,7 +132,7 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 
 ## 12. Ghi chú bảo mật (dữ liệu tài chính cá nhân — nhạy cảm)
 - **`.env` đã `.gitignore`** — không commit `DATABASE_URL`/secret.
-- **Chưa có authentication** — app hiện chạy single-user local/self-host. **Bắt buộc thêm auth trước khi deploy public.**
+- **Authentication (opt-in)**: đặt env `AUTH_PASSWORD` để bật đăng nhập 1 mật khẩu (single-user). Cookie phiên `fin_session` ký HMAC-SHA256 (Web Crypto, `src/lib/auth.ts`), httpOnly, 7 ngày; `src/middleware.ts` chặn mọi route trừ `/login`. `AUTH_SECRET` ký cookie; `CRON_SECRET` cho phép cron gọi `/api/*` qua `?key=`. Không đặt `AUTH_PASSWORD` ⇒ auth tắt (chạy local mở). **Bật auth trước khi deploy public.**
 - Không ghi dữ liệu tài chính thật, token, mật khẩu vào tài liệu/commit.
 - Khi deploy: cân nhắc mã hoá at-rest, dùng mật khẩu DB mạnh (mặc định Docker `finance/finance` chỉ cho local).
 - Disclaimer: app hỗ trợ theo dõi, không phải tư vấn đầu tư.

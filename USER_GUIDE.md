@@ -25,6 +25,11 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 
 **Tìm kiếm & lọc:** dùng thanh lọc để tìm theo **ghi chú**, lọc theo **loại / tài khoản / danh mục / tháng**. Dòng tổng kết hiển thị **số giao dịch khớp + tổng tiền**. Bấm **Xoá lọc** để về danh sách đầy đủ.
 
+## Đăng nhập & bảo mật
+- Mặc định app **không yêu cầu đăng nhập** (tiện chạy local một mình).
+- Để **bật bảo vệ bằng mật khẩu**: đặt biến môi trường `AUTH_PASSWORD` (và nên đặt `AUTH_SECRET`) — xem `.env.example`. Khi bật, mọi trang yêu cầu đăng nhập tại `/login`; có nút **Đăng xuất** ở thanh trên.
+- **Nên bật trước khi đưa app lên mạng** vì đây là dữ liệu tài chính nhạy cảm.
+
 ## Giao dịch định kỳ
 1. Vào **Định kỳ**.
 2. Tạo mẫu: **Loại** (Thu/Chi/Chuyển), **Số tiền**, **Tần suất** (hằng ngày/tuần/tháng), **Tài khoản**, **Danh mục**, **Ngày bắt đầu**, và **Ngày kết thúc** (tuỳ chọn).

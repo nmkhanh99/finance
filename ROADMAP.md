@@ -17,6 +17,7 @@
 - Net Worth theo thời gian (snapshot 1/ngày + biểu đồ đường + cron endpoint).
 - Giao dịch định kỳ (recurring: ngày/tuần/tháng, đuổi kịp, cron endpoint).
 - Import giao dịch từ CSV (validate từng dòng).
+- Authentication opt-in (mật khẩu + cookie HMAC + middleware).
 - Dockerize (Postgres + app + migrate) qua docker-compose.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
@@ -24,7 +25,6 @@
 - Chưa có (đang chờ chọn task tiếp theo).
 
 ## Next
-- **Authentication** (bắt buộc trước khi deploy public) — bảo vệ dữ liệu tài chính.
 - **Biểu đồ giá đầu tư theo thời gian** (đã có `PriceSnapshot`; Net Worth theo thời gian đã xong).
 - **Cron tự động snapshot Net Worth** trong Docker (hiện gọi `/api/networth/snapshot` thủ công).
 - **Import CSV** sao kê (bổ sung cho export đã có).
@@ -39,7 +39,7 @@
 
 ## Technical Debt
 - **Date dùng `timestamp` không-timezone** (lệch +7h) — cân nhắc đổi sang `@db.Date` cho các trường ngày.
-- **Chưa có auth** — single-user local; rủi ro nếu deploy.
+- **Auth là 1 mật khẩu single-user** (opt-in) — đủ cho self-host; chưa hỗ trợ nhiều người dùng/đổi mật khẩu trong UI.
 - **`minPayment` trong mô phỏng trả nợ** dùng ước tính theo gốc & kỳ hạn gốc (không theo dư nợ thực tế còn lại).
 - **Cột giá `Decimal(18,8)`** — đủ cho BTC theo VND hiện tại nhưng cần nới nếu giá/đơn vị vượt ~10 tỷ.
 - **Chưa có Docker daemon để verify** image build end-to-end (mới validate cú pháp + build Next).

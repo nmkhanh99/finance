@@ -5,6 +5,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 ## 2026-06-19
 
 ### Added
+- **Authentication (opt-in)**: đăng nhập 1 mật khẩu qua `AUTH_PASSWORD`, cookie phiên ký HMAC (Web Crypto, không thêm dependency), middleware chặn route, nút Đăng xuất, cron bypass `?key=CRON_SECRET`.
 - **Import giao dịch từ CSV** (trang Import): tải file hoặc dán CSV; validate từng dòng, báo lỗi cụ thể, cập nhật số dư; parser CSV chuẩn RFC 4180.
 - **Giao dịch định kỳ** (trang Định kỳ): mẫu thu/chi/chuyển theo tần suất ngày/tuần/tháng; nút "Chạy ngay" + cron `/api/recurring/run` tự sinh giao dịch (đuổi kịp nhiều kỳ, tự dừng khi hết hạn).
 - **Net Worth theo thời gian**: nút "Ghi lại Net Worth hôm nay" (snapshot 1/ngày) + biểu đồ đường (Recharts) + endpoint cron `/api/networth/snapshot`.
@@ -40,6 +41,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 - Migration `recurring`: model `RecurringTransaction` + enum `RecurrenceFrequency`; `src/lib/recurring.ts` (`nextOccurrence` +4 test), `src/lib/txCore.ts` (`applyTransaction` dùng chung), `src/lib/recurringRun.ts`; refactor `createTransaction` dùng `applyTransaction`. Tổng 37 test pass.
 - `src/lib/csv.ts` (+6 test) và `src/lib/txFilter.ts` (tách `buildTransactionWhere` dùng chung trang Giao dịch + export).
 - `src/lib/csvParse.ts` (+6 test) và `src/lib/importTx.ts` (`validateImportRows`, +5 test) cho import; dùng `applyTransaction` để ghi.
+- `src/lib/auth.ts` (+8 test) + `src/middleware.ts` cho authentication (Web Crypto HMAC). Tổng 56 test pass.
 - `src/lib/finance.ts` + 17 unit test; `src/lib/split.ts` + 6 unit test (tổng 48 test pass).
 - Tiền lưu bằng `Decimal` (không dùng float).
 - Dockerize: `Dockerfile` (multi-stage, Next standalone), `docker-compose.yml` (Postgres + migrate + web), `.dockerignore`, `.env.example`, `DOCKER.md`.

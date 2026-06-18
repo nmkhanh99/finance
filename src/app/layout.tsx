@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import { authEnabled } from "@/lib/auth";
+import { logout } from "./login/actions";
 
 export const metadata: Metadata = {
   title: "Quản lý Tài chính Cá nhân",
@@ -28,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <div className="min-h-screen">
           <header className="border-b border-white/10 bg-black/20">
-            <nav className="mx-auto flex max-w-5xl items-center gap-1 px-4 py-3">
+            <nav className="mx-auto flex max-w-5xl flex-wrap items-center gap-1 px-4 py-3">
               <span className="mr-4 font-semibold text-emerald-400">💰 Finance</span>
               {NAV.map((item) => (
                 <Link
@@ -39,6 +41,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   {item.label}
                 </Link>
               ))}
+              {authEnabled() && (
+                <form action={logout} className="ml-auto">
+                  <button className="rounded-lg px-3 py-1.5 text-sm text-gray-400 hover:bg-white/10 hover:text-white">
+                    Đăng xuất
+                  </button>
+                </form>
+              )}
             </nav>
           </header>
           <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
