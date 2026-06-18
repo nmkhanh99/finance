@@ -46,7 +46,7 @@ Vào **Báo cáo**:
 - **Chi theo danh mục**: tỷ lệ từng nhóm chi.
 - **Chiến lược trả nợ**: nhập số tiền trả thêm/tháng → so sánh **Avalanche** vs **Snowball** (thời gian trả hết, tổng lãi), gợi ý phương án tiết kiệm hơn.
 
-Ngoài ra **Tổng quan** hiển thị Net Worth + phân bổ Tiền mặt / Đầu tư / Dư nợ.
+Ngoài ra **Tổng quan** hiển thị Net Worth + phân bổ Tiền mặt / Đầu tư / Dư nợ, **dòng tiền tháng** (thu/chi/còn lại), **cảnh báo vượt ngân sách**, và **5 giao dịch gần đây**.
 
 ## Tạo ngân sách
 1. Vào **Ngân sách**.

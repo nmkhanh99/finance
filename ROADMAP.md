@@ -12,6 +12,7 @@
 - Ngân sách theo tháng + cảnh báo vượt.
 - Tìm kiếm & lọc giao dịch (ghi chú / loại / tài khoản / danh mục / tháng).
 - Export giao dịch ra CSV (theo bộ lọc).
+- Dashboard tổng quan giàu thông tin (dòng tiền tháng, cảnh báo ngân sách, giao dịch gần đây).
 - Dockerize (Postgres + app + migrate) qua docker-compose.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 

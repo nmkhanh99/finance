@@ -20,6 +20,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 - Tài liệu dự án: `DEVELOPMENT.md`, `USER_GUIDE.md`, `CHANGELOG.md`, `ROADMAP.md`.
 
 ### Changed
+- **Dashboard Tổng quan** bổ sung: dòng tiền tháng (thu/chi/còn lại), cảnh báo vượt ngân sách, 5 giao dịch gần đây.
 - Nút cập nhật giá đổi từ "Cập nhật giá crypto" → "Cập nhật giá" (gộp crypto + chứng khoán VN).
 
 ### Fixed
