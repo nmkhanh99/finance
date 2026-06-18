@@ -38,6 +38,8 @@ src/
     recurringRun.ts     # runDueRecurring — sinh giao dịch định kỳ tới hạn
     txFilter.ts         # buildTransactionWhere — lọc giao dịch dùng chung
     csv.ts              # xuất CSV an toàn (escape RFC 4180)
+    csvParse.ts         # parse CSV (RFC 4180) cho import
+    importTx.ts         # validateImportRows — validate dòng CSV -> giao dịch (pure)
     format.ts           # format tiền/ngày (vi-VN)
     *.test.ts           # unit test (vitest)
 Dockerfile, docker-compose.yml, .dockerignore, .env.example, DOCKER.md

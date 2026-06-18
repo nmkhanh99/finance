@@ -5,6 +5,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 ## 2026-06-19
 
 ### Added
+- **Import giao dịch từ CSV** (trang Import): tải file hoặc dán CSV; validate từng dòng, báo lỗi cụ thể, cập nhật số dư; parser CSV chuẩn RFC 4180.
 - **Giao dịch định kỳ** (trang Định kỳ): mẫu thu/chi/chuyển theo tần suất ngày/tuần/tháng; nút "Chạy ngay" + cron `/api/recurring/run` tự sinh giao dịch (đuổi kịp nhiều kỳ, tự dừng khi hết hạn).
 - **Net Worth theo thời gian**: nút "Ghi lại Net Worth hôm nay" (snapshot 1/ngày) + biểu đồ đường (Recharts) + endpoint cron `/api/networth/snapshot`.
 - **Biểu đồ dòng tiền 6 tháng** (Recharts) trên trang Báo cáo: cột Thu/Chi theo tháng, tooltip VND.
@@ -38,7 +39,8 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 - Migration `networth_snapshot`: model `NetWorthSnapshot`; `src/lib/networth.ts` (`computeNetWorth`/`recordNetWorthSnapshot`) — tách logic Net Worth, Dashboard tái dùng (bỏ trùng lặp).
 - Migration `recurring`: model `RecurringTransaction` + enum `RecurrenceFrequency`; `src/lib/recurring.ts` (`nextOccurrence` +4 test), `src/lib/txCore.ts` (`applyTransaction` dùng chung), `src/lib/recurringRun.ts`; refactor `createTransaction` dùng `applyTransaction`. Tổng 37 test pass.
 - `src/lib/csv.ts` (+6 test) và `src/lib/txFilter.ts` (tách `buildTransactionWhere` dùng chung trang Giao dịch + export).
-- `src/lib/finance.ts` + 17 unit test; `src/lib/split.ts` + 6 unit test (tổng 33 test pass).
+- `src/lib/csvParse.ts` (+6 test) và `src/lib/importTx.ts` (`validateImportRows`, +5 test) cho import; dùng `applyTransaction` để ghi.
+- `src/lib/finance.ts` + 17 unit test; `src/lib/split.ts` + 6 unit test (tổng 48 test pass).
 - Tiền lưu bằng `Decimal` (không dùng float).
 - Dockerize: `Dockerfile` (multi-stage, Next standalone), `docker-compose.yml` (Postgres + migrate + web), `.dockerignore`, `.env.example`, `DOCKER.md`.
 - Thêm rule `documentation-maintenance` (bắt buộc duy trì tài liệu trước khi commit).

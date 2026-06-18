@@ -16,6 +16,7 @@
 - Biểu đồ dòng tiền 6 tháng (Recharts) trên trang Báo cáo.
 - Net Worth theo thời gian (snapshot 1/ngày + biểu đồ đường + cron endpoint).
 - Giao dịch định kỳ (recurring: ngày/tuần/tháng, đuổi kịp, cron endpoint).
+- Import giao dịch từ CSV (validate từng dòng).
 - Dockerize (Postgres + app + migrate) qua docker-compose.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
@@ -30,7 +31,7 @@
 - **Cron tự cập nhật giá** trong Docker (hiện cần gọi `/api/prices/refresh` thủ công).
 
 ## Later
-- Import CSV sao kê ngân hàng (export đã có).
+- Map cột CSV linh hoạt khi import sao kê ngân hàng (định dạng khác nhau giữa ngân hàng).
 - Đa tiền tệ (VND/USD) + tỷ giá.
 - Nhắc lịch trả nợ / đáo hạn (push/email).
 - Mở rộng danh sách mã crypto hỗ trợ / nhập `priceId` tùy chỉnh.
