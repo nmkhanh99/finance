@@ -118,7 +118,7 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 | tailwindcss, @tailwindcss/postcss | Styling |
 | vitest | Test công thức tài chính |
 | decimal.js | Hỗ trợ Decimal (Prisma re-export `Prisma.Decimal`) |
-| recharts | **Đã cài, chưa dùng** — dự kiến vẽ biểu đồ Net Worth/giá |
+| recharts | Vẽ biểu đồ (hiện: dòng tiền 6 tháng ở trang Báo cáo, client component) |
 | tsx | Chạy `prisma/seed.ts` |
 
 ## 12. Ghi chú bảo mật (dữ liệu tài chính cá nhân — nhạy cảm)

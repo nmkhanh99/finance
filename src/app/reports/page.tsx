@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/format";
 import { simulatePayoff, amortizingMonthlyPayment, type DebtForSim } from "@/lib/finance";
+import CashFlowChart, { type MonthPoint } from "./CashFlowChart";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +45,28 @@ export default async function ReportsPage({
   const catRows = [...byCategory.entries()].sort((a, b) => b[1] - a[1]);
   const maxCat = catRows[0]?.[1] ?? 0;
 
+  // ----- Dòng tiền 6 tháng gần nhất (cho biểu đồ) -----
+  const chartStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+  const recentTxs = await prisma.transaction.findMany({
+    where: { date: { gte: chartStart, lt: monthEnd }, type: { in: ["INCOME", "EXPENSE"] } },
+    select: { type: true, amount: true, date: true },
+  });
+  const months: MonthPoint[] = [];
+  const monthIndex = new Map<string, number>();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    monthIndex.set(key, months.length);
+    months.push({ month: `${d.getMonth() + 1}/${d.getFullYear()}`, thu: 0, chi: 0 });
+  }
+  for (const t of recentTxs) {
+    const key = `${t.date.getFullYear()}-${t.date.getMonth()}`;
+    const idx = monthIndex.get(key);
+    if (idx === undefined) continue;
+    if (t.type === "INCOME") months[idx].thu += Number(t.amount);
+    else months[idx].chi += Number(t.amount);
+  }
+
   // ----- Trả nợ: Avalanche vs Snowball -----
   const debts = await prisma.debt.findMany({ include: { payments: true } });
   const simDebts: DebtForSim[] = debts.map((d) => {
@@ -70,6 +93,12 @@ export default async function ReportsPage({
   return (
     <div className="space-y-10">
       <h1 className="text-2xl font-semibold">Báo cáo</h1>
+
+      {/* Biểu đồ dòng tiền 6 tháng */}
+      <section className="space-y-3">
+        <h2 className="text-lg font-medium text-gray-300">Dòng tiền 6 tháng gần nhất</h2>
+        <CashFlowChart data={months} />
+      </section>
 
       {/* Dòng tiền tháng */}
       <section className="space-y-4">

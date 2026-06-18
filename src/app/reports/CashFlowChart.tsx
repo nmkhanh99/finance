@@ -1,0 +1,47 @@
+"use client";
+
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  CartesianGrid,
+} from "recharts";
+
+export interface MonthPoint {
+  month: string; // "6/2026"
+  thu: number;
+  chi: number;
+}
+
+const fmt = (n: number) => new Intl.NumberFormat("vi-VN").format(n);
+const fmtShort = (n: number) => {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(0)}tr`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}k`;
+  return String(n);
+};
+
+export default function CashFlowChart({ data }: { data: MonthPoint[] }) {
+  return (
+    <div className="h-72 w-full rounded-2xl border border-white/10 bg-white/5 p-4">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+          <XAxis dataKey="month" tick={{ fill: "#9ca3af", fontSize: 12 }} />
+          <YAxis tickFormatter={fmtShort} tick={{ fill: "#9ca3af", fontSize: 12 }} width={44} />
+          <Tooltip
+            formatter={(v: number) => `${fmt(v)} ₫`}
+            contentStyle={{ background: "#0b0f1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12 }}
+            labelStyle={{ color: "#e6e9ef" }}
+          />
+          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Bar dataKey="thu" name="Thu" fill="#34d399" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="chi" name="Chi" fill="#f87171" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}

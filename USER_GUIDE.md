@@ -42,6 +42,7 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 
 ## Xem báo cáo
 Vào **Báo cáo**:
+- **Biểu đồ dòng tiền 6 tháng gần nhất**: cột Thu (xanh) / Chi (đỏ) theo tháng, di chuột để xem số tiền.
 - **Dòng tiền tháng**: Thu / Chi / Còn lại (tiết kiệm) tháng hiện tại.
 - **Chi theo danh mục**: tỷ lệ từng nhóm chi.
 - **Chiến lược trả nợ**: nhập số tiền trả thêm/tháng → so sánh **Avalanche** vs **Snowball** (thời gian trả hết, tổng lãi), gợi ý phương án tiết kiệm hơn.

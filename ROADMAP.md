@@ -13,6 +13,7 @@
 - Tìm kiếm & lọc giao dịch (ghi chú / loại / tài khoản / danh mục / tháng).
 - Export giao dịch ra CSV (theo bộ lọc).
 - Dashboard tổng quan giàu thông tin (dòng tiền tháng, cảnh báo ngân sách, giao dịch gần đây).
+- Biểu đồ dòng tiền 6 tháng (Recharts) trên trang Báo cáo.
 - Dockerize (Postgres + app + migrate) qua docker-compose.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
@@ -21,7 +22,7 @@
 
 ## Next
 - **Authentication** (bắt buộc trước khi deploy public) — bảo vệ dữ liệu tài chính.
-- **Biểu đồ Net Worth & giá theo thời gian** (đã có `PriceSnapshot` + Recharts trong deps).
+- **Biểu đồ Net Worth & giá đầu tư theo thời gian** (đã có `PriceSnapshot`; biểu đồ dòng tiền đã xong).
 - **Recurring transactions** (giao dịch định kỳ: lương, tiền nhà, subscription).
 - **Cron tự cập nhật giá** trong Docker (hiện cần gọi `/api/prices/refresh` thủ công).
 
@@ -38,5 +39,5 @@
 - **`minPayment` trong mô phỏng trả nợ** dùng ước tính theo gốc & kỳ hạn gốc (không theo dư nợ thực tế còn lại).
 - **Cột giá `Decimal(18,8)`** — đủ cho BTC theo VND hiện tại nhưng cần nới nếu giá/đơn vị vượt ~10 tỷ.
 - **Chưa có Docker daemon để verify** image build end-to-end (mới validate cú pháp + build Next).
-- **`recharts` đã cài nhưng chưa dùng** — hoặc dùng cho biểu đồ, hoặc gỡ.
+- **`recharts`** — đã dùng cho biểu đồ dòng tiền (Báo cáo); có thể mở rộng cho Net Worth/giá theo thời gian.
 - **Chưa có lint config tùy chỉnh / test cho UI** (chỉ test công thức `lib/`).

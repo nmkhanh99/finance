@@ -5,6 +5,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 ## 2026-06-19
 
 ### Added
+- **Biểu đồ dòng tiền 6 tháng** (Recharts) trên trang Báo cáo: cột Thu/Chi theo tháng, tooltip VND.
 - **Xuất giao dịch ra CSV** (`/api/transactions/export`): theo bộ lọc hiện tại, có BOM UTF-8, số tiền dạng số thô.
 - **Tìm kiếm & lọc giao dịch**: lọc theo ghi chú / loại / tài khoản / danh mục / tháng; hiển thị số giao dịch khớp + tổng tiền.
 - **Ngân sách theo tháng** (trang Ngân sách): đặt hạn mức/tháng cho danh mục Chi; thanh tiến độ đã-chi/hạn-mức (xanh/vàng/đỏ); **cảnh báo vượt ngân sách** + đếm số danh mục vượt.
