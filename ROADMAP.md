@@ -19,6 +19,7 @@
 - Import giao dịch từ CSV (validate từng dòng).
 - Authentication opt-in (mật khẩu + cookie HMAC + middleware).
 - Dockerize (Postgres + app + migrate) qua docker-compose.
+- Cron tự động trong Docker (giá / recurring / snapshot Net Worth).
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
@@ -26,9 +27,8 @@
 
 ## Next
 - **Biểu đồ giá đầu tư theo thời gian** (đã có `PriceSnapshot`; Net Worth theo thời gian đã xong).
-- **Cron tự động snapshot Net Worth** trong Docker (hiện gọi `/api/networth/snapshot` thủ công).
-- **Import CSV** sao kê (bổ sung cho export đã có).
-- **Cron tự cập nhật giá** trong Docker (hiện cần gọi `/api/prices/refresh` thủ công).
+- **Sửa/dừng-tạm giao dịch định kỳ** trong UI (hiện chỉ thêm/xoá).
+- **Nhắc lịch trả nợ / mục tiêu sắp đến hạn** trên Dashboard.
 
 ## Later
 - Map cột CSV linh hoạt khi import sao kê ngân hàng (định dạng khác nhau giữa ngân hàng).

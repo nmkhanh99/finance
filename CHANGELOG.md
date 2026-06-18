@@ -33,6 +33,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 - VNDirect trả HTTP 406 với Node fetch → thêm header `User-Agent` kiểu trình duyệt.
 
 ### Technical
+- **Tự động hoá cron trong Docker**: service `cron` (Alpine + busybox crond) gọi định kỳ `/api/prices/refresh` (15 phút), `/api/recurring/run` & `/api/networth/snapshot` (hằng ngày); truyền `CRON_SECRET` để qua auth. Web service nhận thêm env `AUTH_PASSWORD/AUTH_SECRET/CRON_SECRET`.
 - Khởi tạo Next.js 15 + TypeScript + Tailwind v4 + Prisma 6 + PostgreSQL + Vitest.
 - Migration `init`: Account, Category, Transaction, Holding, PriceSnapshot, Debt, DebtPayment, Goal.
 - Migration `trip_split`: TripGroup, TripMember, TripExpense, TripExpenseShare.

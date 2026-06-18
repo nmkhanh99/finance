@@ -41,6 +41,10 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-finance}:${POSTGRES_PASSWORD:-finance}@db:5432/${POSTGRES_DB:-finance}?schema=finance
       NODE_ENV: production
+      # Auth (tuỳ chọn): đặt AUTH_PASSWORD trong .env để bật đăng nhập.
+      AUTH_PASSWORD: ${AUTH_PASSWORD:-}
+      AUTH_SECRET: ${AUTH_SECRET:-}
+      CRON_SECRET: ${CRON_SECRET:-}
     ports:
       - "${WEB_PORT:-3000}:3000"
     depends_on:
@@ -48,6 +52,18 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
+
+  # Gọi định kỳ các endpoint của web (cập nhật giá, recurring, snapshot Net Worth).
+  cron:
+    image: alpine:3.20
+    restart: unless-stopped
+    environment:
+      CRON_SECRET: ${CRON_SECRET:-}
+    volumes:
+      - ./docker/cron.sh:/cron.sh:ro
+    entrypoint: ["/bin/sh", "-c", "apk add --no-cache curl >/dev/null && exec sh /cron.sh"]
+    depends_on:
+      - web
 
 volumes:
   pgdata:

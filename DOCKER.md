@@ -42,6 +42,14 @@ docker compose down -v          # dừng + XOÁ dữ liệu (volume pgdata)
 docker compose up -d --build    # build lại; migrate tự chạy migration mới
 ```
 
+## Tự động hoá (cron)
+Service `cron` (Alpine + busybox crond) tự gọi định kỳ các endpoint của `web`:
+- **Cập nhật giá** (crypto + CK VN): mỗi 15 phút → `/api/prices/refresh`
+- **Sinh giao dịch định kỳ**: 00:05 hằng ngày → `/api/recurring/run`
+- **Snapshot Net Worth**: 23:30 hằng ngày → `/api/networth/snapshot`
+
+Lịch trong `docker/cron.sh` (giờ UTC). Khi **bật auth** (`AUTH_PASSWORD`), nhớ đặt `CRON_SECRET` trong `.env` để cron vượt qua middleware (gọi kèm `?key=...`). Xem log: `docker compose logs -f cron`.
+
 ## Ghi chú
 - Dữ liệu Postgres lưu ở volume `pgdata` (không mất khi `down`, chỉ mất khi `down -v`).
 - Khi đổi schema Prisma: tạo migration lúc dev local (`npm run db:migrate`), commit thư mục `prisma/migrations`, rồi `up --build` — service `migrate` sẽ apply.
