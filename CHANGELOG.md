@@ -5,6 +5,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 ## 2026-06-19
 
 ### Added
+- **Tìm kiếm & lọc giao dịch**: lọc theo ghi chú / loại / tài khoản / danh mục / tháng; hiển thị số giao dịch khớp + tổng tiền.
 - **Ngân sách theo tháng** (trang Ngân sách): đặt hạn mức/tháng cho danh mục Chi; thanh tiến độ đã-chi/hạn-mức (xanh/vàng/đỏ); **cảnh báo vượt ngân sách** + đếm số danh mục vượt.
 - **Quản lý danh mục** (trang Danh mục): thêm / sửa tên / xoá danh mục Thu-Chi; hiển thị số giao dịch mỗi danh mục; xoá an toàn (gỡ nhãn khỏi giao dịch, không mất giao dịch).
 - Dashboard **Tổng quan**: tài sản ròng (Net Worth) + phân bổ Tiền mặt / Đầu tư / Dư nợ.

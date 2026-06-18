@@ -23,6 +23,8 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 4. Chọn **Danh mục** (tuỳ chọn) và **Ghi chú**.
 5. Bấm **+ Ghi giao dịch**. Số dư tài khoản tự cập nhật. Xoá giao dịch sẽ hoàn lại số dư.
 
+**Tìm kiếm & lọc:** dùng thanh lọc để tìm theo **ghi chú**, lọc theo **loại / tài khoản / danh mục / tháng**. Dòng tổng kết hiển thị **số giao dịch khớp + tổng tiền**. Bấm **Xoá lọc** để về danh sách đầy đủ.
+
 ## Quản lý danh mục
 - App seed sẵn các danh mục (Lương, Thưởng, Ăn uống, Đi lại, Nhà ở/Hoá đơn...).
 - Vào **Danh mục** để: thêm danh mục mới (tên + loại Thu/Chi), **sửa tên** (đổi rồi bấm Lưu), **xoá**. Mỗi danh mục hiển thị số giao dịch đang dùng.

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { formatMoney, formatDate } from "@/lib/format";
 import { createTransaction, deleteTransaction } from "./actions";
+import { Prisma, TransactionType } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -10,16 +11,48 @@ const TYPE_META: Record<string, { label: string; sign: string; color: string }> 
   TRANSFER: { label: "Chuyển", sign: "", color: "text-sky-400" },
 };
 
-export default async function TransactionsPage() {
-  const [accounts, categories, transactions] = await Promise.all([
+interface Filters {
+  q?: string;
+  type?: string;
+  accountId?: string;
+  categoryId?: string;
+  month?: string; // YYYY-MM
+}
+
+export default async function TransactionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Filters>;
+}) {
+  const f = await searchParams;
+
+  // Dựng điều kiện lọc
+  const where: Prisma.TransactionWhereInput = {};
+  if (f.q?.trim()) where.note = { contains: f.q.trim(), mode: "insensitive" };
+  if (f.type === "INCOME" || f.type === "EXPENSE" || f.type === "TRANSFER") {
+    where.type = f.type as TransactionType;
+  }
+  if (f.accountId) where.OR = [{ accountId: f.accountId }, { toAccountId: f.accountId }];
+  if (f.categoryId) where.categoryId = f.categoryId;
+  if (f.month && /^\d{4}-\d{2}$/.test(f.month)) {
+    const [y, m] = f.month.split("-").map(Number);
+    where.date = { gte: new Date(y, m - 1, 1), lt: new Date(y, m, 1) };
+  }
+  const hasFilter = Object.keys(where).length > 0;
+
+  const [accounts, categories, transactions, agg] = await Promise.all([
     prisma.account.findMany({ orderBy: { name: "asc" } }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
     prisma.transaction.findMany({
+      where,
       orderBy: { date: "desc" },
-      take: 50,
+      take: 100,
       include: { account: true, toAccount: true, category: true },
     }),
+    prisma.transaction.aggregate({ where, _count: true, _sum: { amount: true } }),
   ]);
+  const resultCount = agg._count;
+  const resultSum = Number(agg._sum.amount ?? 0);
 
   return (
     <div className="space-y-8">
@@ -118,8 +151,56 @@ export default async function TransactionsPage() {
         </form>
       )}
 
+      {/* Bộ lọc / tìm kiếm */}
+      <form
+        method="get"
+        className="flex flex-wrap items-end gap-2 rounded-2xl border border-white/10 bg-white/5 p-4"
+      >
+        <label className="flex flex-col text-xs">
+          <span className="mb-1 text-gray-400">Tìm ghi chú</span>
+          <input name="q" defaultValue={f.q ?? ""} placeholder="từ khoá..." className="w-40 rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-sm" />
+        </label>
+        <label className="flex flex-col text-xs">
+          <span className="mb-1 text-gray-400">Loại</span>
+          <select name="type" defaultValue={f.type ?? ""} className="rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-sm">
+            <option value="">Tất cả</option>
+            <option value="EXPENSE">Chi</option>
+            <option value="INCOME">Thu</option>
+            <option value="TRANSFER">Chuyển</option>
+          </select>
+        </label>
+        <label className="flex flex-col text-xs">
+          <span className="mb-1 text-gray-400">Tài khoản</span>
+          <select name="accountId" defaultValue={f.accountId ?? ""} className="rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-sm">
+            <option value="">Tất cả</option>
+            {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
+        </label>
+        <label className="flex flex-col text-xs">
+          <span className="mb-1 text-gray-400">Danh mục</span>
+          <select name="categoryId" defaultValue={f.categoryId ?? ""} className="rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-sm">
+            <option value="">Tất cả</option>
+            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </label>
+        <label className="flex flex-col text-xs">
+          <span className="mb-1 text-gray-400">Tháng</span>
+          <input name="month" type="month" defaultValue={f.month ?? ""} className="rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-sm" />
+        </label>
+        <button className="rounded-lg bg-emerald-500 px-3 py-1.5 text-sm font-medium text-black hover:bg-emerald-400">Lọc</button>
+        {hasFilter && (
+          <a href="/transactions" className="rounded-lg border border-white/15 px-3 py-1.5 text-sm hover:bg-white/10">Xoá lọc</a>
+        )}
+      </form>
+
+      {/* Tổng kết kết quả */}
+      <div className="text-sm text-gray-400">
+        {resultCount} giao dịch{hasFilter ? " (đã lọc)" : ""} · tổng {formatMoney(resultSum)}
+        {resultCount > transactions.length ? ` · hiển thị ${transactions.length} mới nhất` : ""}
+      </div>
+
       <div className="space-y-2">
-        {transactions.length === 0 && <p className="text-gray-400">Chưa có giao dịch.</p>}
+        {transactions.length === 0 && <p className="text-gray-400">Không có giao dịch khớp.</p>}
         {transactions.map((t) => {
           const meta = TYPE_META[t.type];
           return (
