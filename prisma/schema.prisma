@@ -1,0 +1,154 @@
+// Prisma schema — Web Quản lý Tài chính Cá nhân
+// Tiền lưu bằng Decimal (KHÔNG dùng float). currency mặc định VND.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----- Tài khoản & dòng tiền -----
+
+enum AccountType {
+  CASH // tiền mặt
+  BANK // tài khoản ngân hàng
+}
+
+model Account {
+  id        String      @id @default(cuid())
+  name      String
+  type      AccountType
+  balance   Decimal     @default(0) @db.Decimal(18, 2)
+  currency  String      @default("VND")
+  note      String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  transactions     Transaction[] @relation("AccountTx")
+  transfersFrom    Transaction[] @relation("FromAccount")
+}
+
+enum TransactionType {
+  INCOME   // thu
+  EXPENSE  // chi
+  TRANSFER // chuyển giữa các tài khoản
+}
+
+model Category {
+  id        String          @id @default(cuid())
+  name      String
+  type      TransactionType // INCOME hoặc EXPENSE
+  icon      String?
+  createdAt DateTime        @default(now())
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id         String          @id @default(cuid())
+  type       TransactionType
+  amount     Decimal         @db.Decimal(18, 2)
+  date       DateTime // ngày phát sinh
+  note       String?
+  createdAt  DateTime        @default(now())
+
+  account    Account  @relation("AccountTx", fields: [accountId], references: [id], onDelete: Cascade)
+  accountId  String
+
+  // chỉ dùng cho TRANSFER: tài khoản nhận
+  toAccount   Account? @relation("FromAccount", fields: [toAccountId], references: [id])
+  toAccountId String?
+
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+
+  @@index([date])
+  @@index([accountId])
+}
+
+// ----- Đầu tư -----
+
+enum AssetType {
+  STOCK  // chứng khoán
+  CRYPTO // tiền ảo
+}
+
+model Holding {
+  id        String    @id @default(cuid())
+  symbol    String // VD: VNM, BTC
+  assetType AssetType
+  quantity  Decimal   @db.Decimal(28, 8) // crypto có phần lẻ lớn
+  avgCost   Decimal   @db.Decimal(18, 8) // giá vốn trung bình / đơn vị
+  currency  String    @default("VND")
+  note      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  prices PriceSnapshot[]
+
+  @@unique([symbol, assetType])
+}
+
+model PriceSnapshot {
+  id        String   @id @default(cuid())
+  holding   Holding  @relation(fields: [holdingId], references: [id], onDelete: Cascade)
+  holdingId String
+  price     Decimal  @db.Decimal(18, 8)
+  at        DateTime @default(now())
+
+  @@index([holdingId, at])
+}
+
+// ----- Nợ / Vay -----
+
+enum DebtInterestType {
+  SIMPLE     // lãi đơn
+  COMPOUND   // lãi kép
+  AMORTIZING // trả góp đều (annuity)
+}
+
+model Debt {
+  id           String           @id @default(cuid())
+  name         String
+  principal    Decimal          @db.Decimal(18, 2) // gốc ban đầu
+  interestRate Decimal          @db.Decimal(9, 6) // lãi suất NĂM, dạng thập phân (0.12 = 12%/năm)
+  interestType DebtInterestType @default(AMORTIZING)
+  termMonths   Int // kỳ hạn (tháng)
+  startDate    DateTime
+  currency     String           @default("VND")
+  note         String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  payments DebtPayment[]
+}
+
+model DebtPayment {
+  id        String   @id @default(cuid())
+  debt      Debt     @relation(fields: [debtId], references: [id], onDelete: Cascade)
+  debtId    String
+  amount    Decimal  @db.Decimal(18, 2) // tổng trả kỳ này
+  principal Decimal  @db.Decimal(18, 2) // phần gốc
+  interest  Decimal  @db.Decimal(18, 2) // phần lãi
+  date      DateTime
+  createdAt DateTime @default(now())
+
+  @@index([debtId, date])
+}
+
+// ----- Mục tiêu -----
+
+model Goal {
+  id           String   @id @default(cuid())
+  name         String
+  targetAmount Decimal  @db.Decimal(18, 2)
+  currentSaved Decimal  @default(0) @db.Decimal(18, 2)
+  targetDate   DateTime
+  currency     String   @default("VND")
+  note         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
