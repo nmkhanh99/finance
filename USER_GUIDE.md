@@ -25,7 +25,8 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 
 ## Quản lý danh mục
 - App seed sẵn các danh mục (Lương, Thưởng, Ăn uống, Đi lại, Nhà ở/Hoá đơn...).
-- **Tạo/sửa/xoá danh mục trong giao diện: Chưa có.** Hiện chỉnh trực tiếp ở DB (bảng `Category`) hoặc sửa `prisma/seed.ts`. Sẽ bổ sung UI sau.
+- Vào **Danh mục** để: thêm danh mục mới (tên + loại Thu/Chi), **sửa tên** (đổi rồi bấm Lưu), **xoá**. Mỗi danh mục hiển thị số giao dịch đang dùng.
+- Xoá danh mục **không làm mất giao dịch**: các giao dịch đang dùng sẽ được gỡ nhãn danh mục (thành "không danh mục"), không bị xoá.
 
 ## Đầu tư (chứng khoán / tiền ảo)
 1. Vào **Đầu tư**, nhập **Mã** (vd `VNM`, `BTC`), **Loại**, **Số lượng**, **Giá vốn/đơn vị**, bấm **+ Thêm**. Thêm trùng mã sẽ tự gộp và tính lại giá vốn trung bình.

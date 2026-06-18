@@ -8,6 +8,7 @@
 - Mục tiêu tiết kiệm (cần X/tháng).
 - Báo cáo: dòng tiền, chi theo danh mục, Avalanche vs Snowball.
 - Chia tiền nhóm: chia đều/tùy chỉnh, báo cáo, phương án thanh toán tối thiểu.
+- Quản lý danh mục (CRUD) trong UI.
 - Dockerize (Postgres + app + migrate) qua docker-compose.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
@@ -16,7 +17,6 @@
 
 ## Next
 - **Authentication** (bắt buộc trước khi deploy public) — bảo vệ dữ liệu tài chính.
-- **Quản lý danh mục trong UI** (hiện chỉ seed/sửa DB).
 - **Ngân sách có hạn mức + cảnh báo vượt** (hiện mới có báo cáo chi theo danh mục).
 - **Biểu đồ Net Worth & giá theo thời gian** (đã có `PriceSnapshot` + Recharts trong deps).
 - **Cron tự cập nhật giá** trong Docker (hiện cần gọi `/api/prices/refresh` thủ công).

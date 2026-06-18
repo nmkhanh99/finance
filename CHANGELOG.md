@@ -5,6 +5,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 ## 2026-06-19
 
 ### Added
+- **Quản lý danh mục** (trang Danh mục): thêm / sửa tên / xoá danh mục Thu-Chi; hiển thị số giao dịch mỗi danh mục; xoá an toàn (gỡ nhãn khỏi giao dịch, không mất giao dịch).
 - Dashboard **Tổng quan**: tài sản ròng (Net Worth) + phân bổ Tiền mặt / Đầu tư / Dư nợ.
 - **Tài khoản**: CRUD ví tiền mặt / ngân hàng, cập nhật số dư.
 - **Giao dịch**: thu / chi / chuyển khoản, tự cập nhật số dư tài khoản; danh mục seed sẵn.
