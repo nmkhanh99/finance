@@ -15,6 +15,7 @@ const NAV = [
   { href: "/debts", label: "Nợ / Vay" },
   { href: "/goals", label: "Mục tiêu" },
   { href: "/reports", label: "Báo cáo" },
+  { href: "/trips", label: "Chia tiền nhóm" },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
