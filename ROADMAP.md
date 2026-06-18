@@ -1,0 +1,38 @@
+# ROADMAP
+
+## Done
+- Dashboard Net Worth (tiền mặt + đầu tư − nợ).
+- Tài khoản (CRUD), Giao dịch (thu/chi/chuyển, tự cập nhật số dư).
+- Đầu tư: holdings + P&L; tự cập nhật giá crypto (CoinGecko) & cổ phiếu VN (VNDirect).
+- Nợ/Vay: lãi đơn/kép/trả góp đều, lịch trả góp, ghi nhận trả nợ.
+- Mục tiêu tiết kiệm (cần X/tháng).
+- Báo cáo: dòng tiền, chi theo danh mục, Avalanche vs Snowball.
+- Chia tiền nhóm: chia đều/tùy chỉnh, báo cáo, phương án thanh toán tối thiểu.
+- Dockerize (Postgres + app + migrate) qua docker-compose.
+- Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
+
+## In Progress
+- Chưa có (đang chờ chọn task tiếp theo).
+
+## Next
+- **Authentication** (bắt buộc trước khi deploy public) — bảo vệ dữ liệu tài chính.
+- **Quản lý danh mục trong UI** (hiện chỉ seed/sửa DB).
+- **Ngân sách có hạn mức + cảnh báo vượt** (hiện mới có báo cáo chi theo danh mục).
+- **Biểu đồ Net Worth & giá theo thời gian** (đã có `PriceSnapshot` + Recharts trong deps).
+- **Cron tự cập nhật giá** trong Docker (hiện cần gọi `/api/prices/refresh` thủ công).
+
+## Later
+- Import CSV sao kê ngân hàng / Export báo cáo.
+- Đa tiền tệ (VND/USD) + tỷ giá.
+- Nhắc lịch trả nợ / đáo hạn (push/email).
+- Mở rộng danh sách mã crypto hỗ trợ / nhập `priceId` tùy chỉnh.
+- Ghi phần chi của "tôi" trong nhóm vào Giao dịch cá nhân (liên kết Trip ↔ tài chính cá nhân).
+
+## Technical Debt
+- **Date dùng `timestamp` không-timezone** (lệch +7h) — cân nhắc đổi sang `@db.Date` cho các trường ngày.
+- **Chưa có auth** — single-user local; rủi ro nếu deploy.
+- **`minPayment` trong mô phỏng trả nợ** dùng ước tính theo gốc & kỳ hạn gốc (không theo dư nợ thực tế còn lại).
+- **Cột giá `Decimal(18,8)`** — đủ cho BTC theo VND hiện tại nhưng cần nới nếu giá/đơn vị vượt ~10 tỷ.
+- **Chưa có Docker daemon để verify** image build end-to-end (mới validate cú pháp + build Next).
+- **`recharts` đã cài nhưng chưa dùng** — hoặc dùng cho biểu đồ, hoặc gỡ.
+- **Chưa có lint config tùy chỉnh / test cho UI** (chỉ test công thức `lib/`).
