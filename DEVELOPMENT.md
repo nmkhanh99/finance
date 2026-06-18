@@ -38,6 +38,7 @@ src/
     recurring.ts        # nextOccurrence (tần suất, pure)
     recurringRun.ts     # runDueRecurring — sinh giao dịch định kỳ tới hạn
     reminders.ts        # addMonths/daysBetween/dueStatus — nhắc đến hạn
+    currency.ts         # convertToBase — quy đổi đa tiền tệ về VND
     txFilter.ts         # buildTransactionWhere — lọc giao dịch dùng chung
     csv.ts              # xuất CSV an toàn (escape RFC 4180)
     csvParse.ts         # parse CSV (RFC 4180) cho import
@@ -100,6 +101,7 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 - `Budget` (categoryId unique, limitAmount) — hạn mức chi/tháng theo danh mục
 - `NetWorthSnapshot` (date unique, totalCash/Invest/Debt, netWorth) — lịch sử Net Worth (1/ngày)
 - `RecurringTransaction` (type, amount, frequency, startDate, nextRun, endDate, active) — mẫu giao dịch định kỳ
+- `ExchangeRate` (code, rate) — tỷ giá quy đổi về VND (base); VND=1
 
 **Chia tiền nhóm (độc lập):**
 - `TripGroup` → `TripMember`, `TripExpense`

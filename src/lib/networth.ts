@@ -1,5 +1,6 @@
 import { prisma } from "./db";
 import { netWorth } from "./finance";
+import { convertToBase } from "./currency";
 import { Prisma } from "@prisma/client";
 
 export interface NetWorthBreakdown {
@@ -11,20 +12,28 @@ export interface NetWorthBreakdown {
 
 /** Tính tài sản ròng hiện tại từ tài khoản + đầu tư (giá mới nhất) − dư nợ. */
 export async function computeNetWorth(): Promise<NetWorthBreakdown> {
-  const [accounts, holdings, debts] = await Promise.all([
+  const [accounts, holdings, debts, rateRows] = await Promise.all([
     prisma.account.findMany(),
     prisma.holding.findMany({ include: { prices: { orderBy: { at: "desc" }, take: 1 } } }),
     prisma.debt.findMany({ include: { payments: true } }),
+    prisma.exchangeRate.findMany(),
   ]);
 
-  const accountBalances = accounts.map((a) => Number(a.balance));
+  // map tỷ giá: code -> số VND/1 đơn vị
+  const rates: Record<string, number> = {};
+  for (const r of rateRows) rates[r.code] = Number(r.rate);
+
+  // Mọi giá trị quy đổi về VND (base) trước khi cộng
+  const accountBalances = accounts.map((a) => convertToBase(Number(a.balance), a.currency, rates));
   const holdingsForNW = holdings.map((h) => {
     const latest = h.prices[0]?.price ?? h.avgCost; // chưa có giá thị trường thì dùng giá vốn
-    return { quantity: Number(h.quantity), currentPrice: Number(latest) };
+    const valueInCcy = Number(h.quantity) * Number(latest);
+    return { quantity: 1, currentPrice: convertToBase(valueInCcy, h.currency, rates) };
   });
   const debtsOutstanding = debts.map((d) => {
     const paidPrincipal = d.payments.reduce((s, p) => s + Number(p.principal), 0);
-    return Math.max(Number(d.principal) - paidPrincipal, 0);
+    const outstanding = Math.max(Number(d.principal) - paidPrincipal, 0);
+    return convertToBase(outstanding, d.currency, rates);
   });
 
   const totalCash = accountBalances.reduce((s, b) => s + b, 0);

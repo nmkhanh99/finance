@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/format";
+import { convertToBase } from "@/lib/currency";
 import { createAccount, updateBalance, deleteAccount } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -7,15 +8,20 @@ export const dynamic = "force-dynamic";
 const TYPE_LABEL: Record<string, string> = { CASH: "Tiền mặt", BANK: "Ngân hàng" };
 
 export default async function AccountsPage() {
-  const accounts = await prisma.account.findMany({ orderBy: { createdAt: "asc" } });
-  const total = accounts.reduce((s, a) => s + Number(a.balance), 0);
+  const [accounts, rateRows] = await Promise.all([
+    prisma.account.findMany({ orderBy: { createdAt: "asc" } }),
+    prisma.exchangeRate.findMany(),
+  ]);
+  const rates: Record<string, number> = {};
+  for (const r of rateRows) rates[r.code] = Number(r.rate);
+  const total = accounts.reduce((s, a) => s + convertToBase(Number(a.balance), a.currency, rates), 0);
 
   return (
     <div className="space-y-8">
       <div className="flex items-baseline justify-between">
         <h1 className="text-2xl font-semibold">Tài khoản</h1>
         <span className="text-gray-400">
-          Tổng: <span className="font-semibold text-sky-400">{formatMoney(total)}</span>
+          Tổng (quy đổi VND): <span className="font-semibold text-sky-400">{formatMoney(total)}</span>
         </span>
       </div>
 
@@ -41,13 +47,22 @@ export default async function AccountsPage() {
           </select>
         </label>
         <label className="flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Số dư (VND)</span>
+          <span className="mb-1 text-gray-400">Số dư</span>
           <input
             name="balance"
             type="number"
             step="1000"
             defaultValue={0}
             className="rounded-lg border border-white/10 bg-black/30 px-3 py-2"
+          />
+        </label>
+        <label className="flex flex-col text-sm">
+          <span className="mb-1 text-gray-400">Tiền tệ</span>
+          <input
+            name="currency"
+            defaultValue="VND"
+            maxLength={5}
+            className="w-24 rounded-lg border border-white/10 bg-black/30 px-3 py-2 uppercase"
           />
         </label>
         <button className="rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black hover:bg-emerald-400">
@@ -65,7 +80,9 @@ export default async function AccountsPage() {
           >
             <div>
               <div className="font-medium">{a.name}</div>
-              <div className="text-xs text-gray-400">{TYPE_LABEL[a.type]}</div>
+              <div className="text-xs text-gray-400">
+                {TYPE_LABEL[a.type]} · {a.currency} · {formatMoney(Number(a.balance), a.currency)}
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <form action={updateBalance} className="flex items-center gap-2">

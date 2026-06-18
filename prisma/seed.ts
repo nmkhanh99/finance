@@ -16,6 +16,13 @@ const CATEGORIES: { name: string; type: TransactionType }[] = [
 ];
 
 async function main() {
+  // Tỷ giá gốc VND = 1 (idempotent)
+  await prisma.exchangeRate.upsert({
+    where: { code: "VND" },
+    create: { code: "VND", rate: 1 },
+    update: {},
+  });
+
   const count = await prisma.category.count();
   if (count > 0) {
     console.log(`Đã có ${count} danh mục, bỏ qua seed.`);

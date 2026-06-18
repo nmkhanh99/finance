@@ -20,6 +20,7 @@ const NAV = [
   { href: "/debts", label: "Nợ / Vay" },
   { href: "/goals", label: "Mục tiêu" },
   { href: "/budgets", label: "Ngân sách" },
+  { href: "/rates", label: "Tỷ giá" },
   { href: "/reports", label: "Báo cáo" },
   { href: "/trips", label: "Chia tiền nhóm" },
 ];

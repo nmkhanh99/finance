@@ -214,6 +214,13 @@ model TripExpense {
   @@index([groupId])
 }
 
+// Tỷ giá quy đổi về tiền tệ gốc (base = VND). rate = số VND cho 1 đơn vị `code`. VND có rate = 1.
+model ExchangeRate {
+  code      String   @id // "VND", "USD", ...
+  rate      Decimal  @db.Decimal(18, 6)
+  updatedAt DateTime @updatedAt
+}
+
 enum RecurrenceFrequency {
   DAILY
   WEEKLY

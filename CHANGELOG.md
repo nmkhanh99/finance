@@ -5,6 +5,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 ## 2026-06-19
 
 ### Added
+- **Đa tiền tệ**: model `ExchangeRate` + trang **Tỷ giá** (base VND); chọn tiền tệ khi tạo Tài khoản/Đầu tư; Net Worth & tổng tài khoản/đầu tư quy đổi về VND. `src/lib/currency.ts` (`convertToBase`, +3 test).
 - **Nhắc nhở đến hạn** trên Dashboard: khoản nợ còn dư sắp đáo hạn (startDate+kỳ hạn) và mục tiêu chưa đạt sắp đến hạn — trong 30 ngày (vàng) hoặc quá hạn (đỏ); `src/lib/reminders.ts` +3 test.
 - **Biểu đồ lịch sử giá đầu tư** (trang Đầu tư): chọn mã → đường giá theo thời gian từ `PriceSnapshot` (Recharts).
 - **Authentication (opt-in)**: đăng nhập 1 mật khẩu qua `AUTH_PASSWORD`, cookie phiên ký HMAC (Web Crypto, không thêm dependency), middleware chặn route, nút Đăng xuất, cron bypass `?key=CRON_SECRET`.

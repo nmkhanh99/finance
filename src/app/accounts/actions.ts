@@ -8,10 +8,11 @@ export async function createAccount(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const type = String(formData.get("type") ?? "BANK") as AccountType;
   const balance = Number(formData.get("balance") ?? 0);
+  const currency = (String(formData.get("currency") ?? "VND").trim().toUpperCase() || "VND").slice(0, 5);
   if (!name) return;
 
   await prisma.account.create({
-    data: { name, type, balance, currency: "VND" },
+    data: { name, type, balance, currency },
   });
   revalidatePath("/accounts");
   revalidatePath("/");

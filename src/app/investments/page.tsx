@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { formatMoney, formatDate } from "@/lib/format";
 import { unrealizedPnL } from "@/lib/finance";
+import { convertToBase } from "@/lib/currency";
 import { createHolding, updatePrice, deleteHolding, refreshPrices } from "./actions";
 import PriceChart, { type PricePoint } from "./PriceChart";
 
@@ -19,10 +20,15 @@ export default async function InvestmentsPage({
   searchParams: Promise<{ updated?: string; skipped?: string; error?: string; symbol?: string }>;
 }) {
   const sp = await searchParams;
-  const holdings = await prisma.holding.findMany({
-    orderBy: { createdAt: "asc" },
-    include: { prices: { orderBy: { at: "desc" }, take: 1 } },
-  });
+  const [holdings, rateRows] = await Promise.all([
+    prisma.holding.findMany({
+      orderBy: { createdAt: "asc" },
+      include: { prices: { orderBy: { at: "desc" }, take: 1 } },
+    }),
+    prisma.exchangeRate.findMany(),
+  ]);
+  const rates: Record<string, number> = {};
+  for (const r of rateRows) rates[r.code] = Number(r.rate);
 
   // Mã được chọn để xem lịch sử giá
   const selected = holdings.find((h) => h.symbol === sp.symbol) ?? holdings[0];
@@ -47,8 +53,9 @@ export default async function InvestmentsPage({
     return { h, qty, avgCost, currentPrice, hasPrice: !!latest, priceAt: latest?.at, pnl };
   });
 
-  const totalMarket = rows.reduce((s, r) => s + r.pnl.marketValue, 0);
-  const totalCost = rows.reduce((s, r) => s + r.pnl.costBasis, 0);
+  // Tổng quy đổi về VND (mỗi holding có thể khác tiền tệ)
+  const totalMarket = rows.reduce((s, r) => s + convertToBase(r.pnl.marketValue, r.h.currency, rates), 0);
+  const totalCost = rows.reduce((s, r) => s + convertToBase(r.pnl.costBasis, r.h.currency, rates), 0);
   const totalPnL = totalMarket - totalCost;
 
   return (
@@ -57,7 +64,7 @@ export default async function InvestmentsPage({
         <h1 className="text-2xl font-semibold">Đầu tư</h1>
         <div className="flex items-center gap-4">
           <div className="text-right text-sm text-gray-400">
-            Giá trị TT:{" "}
+            Giá trị TT (VND):{" "}
             <span className="font-semibold text-amber-400">{formatMoney(totalMarket)}</span>
             <span className="mx-2">·</span>
             Lãi/lỗ:{" "}
@@ -95,7 +102,7 @@ export default async function InvestmentsPage({
       {/* Form thêm holding */}
       <form
         action={createHolding}
-        className="grid grid-cols-2 gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:grid-cols-5"
+        className="grid grid-cols-2 gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:grid-cols-6"
       >
         <label className="flex flex-col text-sm">
           <span className="mb-1 text-gray-400">Mã</span>
@@ -135,6 +142,10 @@ export default async function InvestmentsPage({
             className="rounded-lg border border-white/10 bg-black/30 px-3 py-2"
           />
         </label>
+        <label className="flex flex-col text-sm">
+          <span className="mb-1 text-gray-400">Tiền tệ</span>
+          <input name="currency" defaultValue="VND" maxLength={5} className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 uppercase" />
+        </label>
         <button className="self-end rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black hover:bg-emerald-400">
           + Thêm / Mua thêm
         </button>
@@ -168,7 +179,7 @@ export default async function InvestmentsPage({
                     <div className="text-xs text-gray-500">{ASSET_LABEL[h.assetType]}</div>
                   </td>
                   <td className="py-3 pr-3">{qty}</td>
-                  <td className="py-3 pr-3">{formatMoney(avgCost)}</td>
+                  <td className="py-3 pr-3">{formatMoney(avgCost, h.currency)}</td>
                   <td className="py-3 pr-3">
                     <form action={updatePrice} className="flex items-center gap-1">
                       <input type="hidden" name="holdingId" value={h.id} />
@@ -192,14 +203,14 @@ export default async function InvestmentsPage({
                       <div className="mt-0.5 text-[10px] text-gray-500">{formatTime(priceAt)}</div>
                     )}
                   </td>
-                  <td className="py-3 pr-3 text-right">{formatMoney(pnl.marketValue)}</td>
+                  <td className="py-3 pr-3 text-right">{formatMoney(pnl.marketValue, h.currency)}</td>
                   <td
                     className={`py-3 pr-3 text-right font-medium ${
                       pnl.amount >= 0 ? "text-emerald-400" : "text-red-400"
                     }`}
                   >
                     {pnl.amount >= 0 ? "+" : ""}
-                    {formatMoney(pnl.amount)}
+                    {formatMoney(pnl.amount, h.currency)}
                     <div className="text-xs font-normal">
                       {pnl.percent >= 0 ? "+" : ""}
                       {pnl.percent}%

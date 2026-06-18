@@ -13,6 +13,7 @@ export async function createHolding(formData: FormData) {
   const assetType = String(formData.get("assetType") ?? "STOCK") as AssetType;
   const quantity = Number(formData.get("quantity") ?? 0);
   const avgCost = Number(formData.get("avgCost") ?? 0);
+  const currency = (String(formData.get("currency") ?? "VND").trim().toUpperCase() || "VND").slice(0, 5);
   if (!symbol || quantity <= 0 || avgCost < 0) return;
 
   const existing = await prisma.holding.findUnique({
@@ -30,7 +31,7 @@ export async function createHolding(formData: FormData) {
     });
   } else {
     await prisma.holding.create({
-      data: { symbol, assetType, quantity, avgCost, currency: "VND" },
+      data: { symbol, assetType, quantity, avgCost, currency },
     });
   }
   revalidatePath("/investments");

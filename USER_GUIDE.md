@@ -25,6 +25,12 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 
 **Tìm kiếm & lọc:** dùng thanh lọc để tìm theo **ghi chú**, lọc theo **loại / tài khoản / danh mục / tháng**. Dòng tổng kết hiển thị **số giao dịch khớp + tổng tiền**. Bấm **Xoá lọc** để về danh sách đầy đủ.
 
+## Đa tiền tệ & tỷ giá
+- Tiền tệ gốc là **VND**. Khi tạo Tài khoản hoặc khoản Đầu tư, có thể nhập **mã tiền tệ** khác (vd `USD`).
+- Vào **Tỷ giá** để đặt **1 đơn vị ngoại tệ = bao nhiêu VND** (vd USD = 25000).
+- **Net Worth** và **tổng tài khoản/đầu tư** tự **quy đổi mọi tiền tệ về VND** theo tỷ giá. Số dư/giá từng dòng vẫn hiển thị theo tiền tệ gốc của nó.
+- Lưu ý: Báo cáo dòng tiền & Ngân sách hiện cộng theo số tiền giao dịch chưa quy đổi — phù hợp khi chi tiêu cùng một tiền tệ.
+
 ## Đăng nhập & bảo mật
 - Mặc định app **không yêu cầu đăng nhập** (tiện chạy local một mình).
 - Để **bật bảo vệ bằng mật khẩu**: đặt biến môi trường `AUTH_PASSWORD` (và nên đặt `AUTH_SECRET`) — xem `.env.example`. Khi bật, mọi trang yêu cầu đăng nhập tại `/login`; có nút **Đăng xuất** ở thanh trên.
