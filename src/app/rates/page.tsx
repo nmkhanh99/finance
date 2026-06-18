@@ -1,14 +1,27 @@
 import { prisma } from "@/lib/db";
-import { setRate, deleteRate } from "./actions";
+import { setRate, deleteRate, refreshRates } from "./actions";
 
 export const dynamic = "force-dynamic";
 
+const fmtTime = (d: Date) =>
+  new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short" }).format(d);
+
 export default async function RatesPage() {
   const rates = await prisma.exchangeRate.findMany({ orderBy: { code: "asc" } });
+  const hasForeign = rates.some((r) => r.code !== "VND");
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Tỷ giá</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-2xl font-semibold">Tỷ giá</h1>
+        {hasForeign && (
+          <form action={refreshRates}>
+            <button className="rounded-lg border border-sky-500/40 px-3 py-1.5 text-sm text-sky-400 hover:bg-sky-500/10">
+              ↻ Cập nhật tỷ giá từ API
+            </button>
+          </form>
+        )}
+      </div>
       <p className="text-sm text-gray-400">
         Tiền tệ gốc là <b>VND</b>. Đặt tỷ giá: <b>1 đơn vị ngoại tệ = bao nhiêu VND</b> (vd USD = 25000).
         Net Worth quy đổi mọi tài khoản/đầu tư/nợ về VND theo các tỷ giá này.
@@ -32,6 +45,7 @@ export default async function RatesPage() {
             <div className="text-sm">
               <span className="font-medium">{r.code}</span>
               <span className="text-gray-400"> = {new Intl.NumberFormat("vi-VN").format(Number(r.rate))} VND</span>
+              {r.code !== "VND" && <span className="ml-2 text-xs text-gray-500">cập nhật {fmtTime(r.updatedAt)}</span>}
             </div>
             {r.code !== "VND" && (
               <form action={deleteRate}>

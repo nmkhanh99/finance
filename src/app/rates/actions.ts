@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
+import { refreshFxRates } from "@/lib/fxRates";
 
 export async function setRate(formData: FormData) {
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
@@ -15,6 +16,12 @@ export async function setRate(formData: FormData) {
     create: { code, rate: new Prisma.Decimal(rate) },
     update: { rate: new Prisma.Decimal(rate) },
   });
+  revalidatePath("/rates");
+  revalidatePath("/");
+}
+
+export async function refreshRates() {
+  await refreshFxRates();
   revalidatePath("/rates");
   revalidatePath("/");
 }

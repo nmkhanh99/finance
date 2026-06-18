@@ -24,13 +24,13 @@
 - Nhắc khoản nợ / mục tiêu sắp đến hạn trên Dashboard.
 - Sửa & tạm dừng/tiếp tục giao dịch định kỳ trong UI.
 - Đa tiền tệ (VND base + tỷ giá); Net Worth + dòng tiền + ngân sách quy đổi.
+- Tự cập nhật tỷ giá từ API (open.er-api.com) + cron.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
 - Chưa có (đang chờ chọn task tiếp theo).
 
 ## Next
-- **Tự cập nhật tỷ giá** từ API (hiện nhập tay).
 - **Nhắc qua email/push** (hiện chỉ nhắc trong app).
 - **Quy đổi tiền tệ cho phần chia tiền nhóm** (hiện giả định cùng tiền tệ).
 

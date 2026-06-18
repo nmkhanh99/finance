@@ -27,7 +27,7 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 
 ## Đa tiền tệ & tỷ giá
 - Tiền tệ gốc là **VND**. Khi tạo Tài khoản hoặc khoản Đầu tư, có thể nhập **mã tiền tệ** khác (vd `USD`).
-- Vào **Tỷ giá** để đặt **1 đơn vị ngoại tệ = bao nhiêu VND** (vd USD = 25000).
+- Vào **Tỷ giá** để đặt **1 đơn vị ngoại tệ = bao nhiêu VND** (vd USD = 25000), hoặc bấm **↻ Cập nhật tỷ giá từ API** để tự lấy tỷ giá mới nhất (open.er-api.com). Mỗi dòng hiện giờ cập nhật gần nhất.
 - **Net Worth**, **tổng tài khoản/đầu tư**, **dòng tiền (Báo cáo & Dashboard)** và **ngân sách** đều **quy đổi mọi tiền tệ về VND** theo tỷ giá. Số dư/giá từng dòng vẫn hiển thị theo tiền tệ gốc của nó.
 
 ## Đăng nhập & bảo mật

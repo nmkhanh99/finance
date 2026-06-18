@@ -5,6 +5,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 ## 2026-06-19
 
 ### Added
+- **Tự cập nhật tỷ giá từ API** (open.er-api.com): nút trên trang Tỷ giá + endpoint cron `/api/rates/refresh`; `src/lib/fxRates.ts`.
 - **Đa tiền tệ**: model `ExchangeRate` + trang **Tỷ giá** (base VND); chọn tiền tệ khi tạo Tài khoản/Đầu tư; Net Worth & tổng tài khoản/đầu tư quy đổi về VND. `src/lib/currency.ts` (`convertToBase`, +3 test).
 - **Nhắc nhở đến hạn** trên Dashboard: khoản nợ còn dư sắp đáo hạn (startDate+kỳ hạn) và mục tiêu chưa đạt sắp đến hạn — trong 30 ngày (vàng) hoặc quá hạn (đỏ); `src/lib/reminders.ts` +3 test.
 - **Biểu đồ lịch sử giá đầu tư** (trang Đầu tư): chọn mã → đường giá theo thời gian từ `PriceSnapshot` (Recharts).

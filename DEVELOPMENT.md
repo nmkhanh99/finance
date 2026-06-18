@@ -40,6 +40,7 @@ src/
     reminders.ts        # addMonths/daysBetween/dueStatus — nhắc đến hạn
     currency.ts         # convertToBase — quy đổi đa tiền tệ về VND
     rates.ts            # loadRates — nạp bảng tỷ giá (server)
+    fxRates.ts          # refreshFxRates — lấy tỷ giá live (open.er-api.com)
     txFilter.ts         # buildTransactionWhere — lọc giao dịch dùng chung
     csv.ts              # xuất CSV an toàn (escape RFC 4180)
     csvParse.ts         # parse CSV (RFC 4180) cho import
@@ -147,4 +148,4 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 ## 14. Biến môi trường & cron
 - `DATABASE_URL` — kết nối Postgres (bắt buộc).
 - `AUTH_PASSWORD` — đặt để bật auth (bỏ trống = tắt). `AUTH_SECRET` — ký cookie phiên. `CRON_SECRET` — cho cron gọi `/api/*` qua `?key=`.
-- **Cron tự động (Docker):** service `cron` chạy `docker/cron.sh` (busybox crond) gọi `/api/prices/refresh` (15 phút), `/api/recurring/run` & `/api/networth/snapshot` (hằng ngày). Chạy thủ công ngoài Docker: đặt crontab gọi `curl` tới các endpoint đó (xem comment trong mỗi route).
+- **Cron tự động (Docker):** service `cron` chạy `docker/cron.sh` (busybox crond) gọi `/api/prices/refresh` (15 phút), `/api/recurring/run`, `/api/networth/snapshot` & `/api/rates/refresh` (hằng ngày). Chạy thủ công ngoài Docker: đặt crontab gọi `curl` tới các endpoint đó (xem comment trong mỗi route).
