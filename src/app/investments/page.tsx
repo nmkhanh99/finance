@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { formatMoney, formatDate } from "@/lib/format";
 import { unrealizedPnL } from "@/lib/finance";
 import { createHolding, updatePrice, deleteHolding, refreshPrices } from "./actions";
+import PriceChart, { type PricePoint } from "./PriceChart";
 
 export const dynamic = "force-dynamic";
 
@@ -14,13 +16,27 @@ function formatTime(d: Date): string {
 export default async function InvestmentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ updated?: string; skipped?: string; error?: string }>;
+  searchParams: Promise<{ updated?: string; skipped?: string; error?: string; symbol?: string }>;
 }) {
   const sp = await searchParams;
   const holdings = await prisma.holding.findMany({
     orderBy: { createdAt: "asc" },
     include: { prices: { orderBy: { at: "desc" }, take: 1 } },
   });
+
+  // Mã được chọn để xem lịch sử giá
+  const selected = holdings.find((h) => h.symbol === sp.symbol) ?? holdings[0];
+  const history = selected
+    ? await prisma.priceSnapshot.findMany({
+        where: { holdingId: selected.id },
+        orderBy: { at: "asc" },
+        take: 200,
+      })
+    : [];
+  const pricePoints: PricePoint[] = history.map((s) => ({
+    t: new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(s.at),
+    price: Number(s.price),
+  }));
 
   const rows = holdings.map((h) => {
     const qty = Number(h.quantity);
@@ -203,6 +219,35 @@ export default async function InvestmentsPage({
           </table>
         )}
       </div>
+
+      {/* Lịch sử giá */}
+      {selected && (
+        <section className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-medium text-gray-300">Lịch sử giá</h2>
+            <div className="flex flex-wrap gap-1">
+              {holdings.map((h) => (
+                <Link
+                  key={h.id}
+                  href={`/investments?symbol=${h.symbol}`}
+                  className={`rounded-lg px-2.5 py-1 text-xs ${
+                    h.id === selected.id ? "bg-amber-400 text-black" : "border border-white/15 hover:bg-white/10"
+                  }`}
+                >
+                  {h.symbol}
+                </Link>
+              ))}
+            </div>
+          </div>
+          {pricePoints.length >= 2 ? (
+            <PriceChart data={pricePoints} symbol={selected.symbol} />
+          ) : (
+            <p className="rounded-xl border border-dashed border-white/15 p-5 text-center text-sm text-gray-400">
+              {selected.symbol}: chưa đủ dữ liệu giá. Bấm "↻ Cập nhật giá" hoặc nhập giá thủ công nhiều lần để vẽ biểu đồ.
+            </p>
+          )}
+        </section>
+      )}
     </div>
   );
 }

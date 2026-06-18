@@ -47,6 +47,7 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 1. Vào **Đầu tư**, nhập **Mã** (vd `VNM`, `BTC`), **Loại**, **Số lượng**, **Giá vốn/đơn vị**, bấm **+ Thêm**. Thêm trùng mã sẽ tự gộp và tính lại giá vốn trung bình.
 2. Nhập **giá hiện tại** ở ô từng dòng rồi bấm ↻ để cập nhật thủ công.
 3. Hoặc bấm **↻ Cập nhật giá** để tự lấy giá: tiền ảo (CoinGecko), cổ phiếu VN (VNDirect). Cột Lãi/Lỗ và % cập nhật theo.
+4. Mục **Lịch sử giá** ở cuối trang: chọn mã để xem biểu đồ đường giá theo thời gian (cần ≥ 2 lần cập nhật giá).
 
 ## Nợ / Vay
 1. Vào **Nợ/Vay**, nhập **Tên**, **Gốc**, **Lãi suất %/năm**, **Kỳ hạn (tháng)**, **Loại lãi** (Trả góp đều / Lãi đơn / Lãi kép), **Ngày bắt đầu**.

@@ -20,13 +20,13 @@
 - Authentication opt-in (mật khẩu + cookie HMAC + middleware).
 - Dockerize (Postgres + app + migrate) qua docker-compose.
 - Cron tự động trong Docker (giá / recurring / snapshot Net Worth).
+- Biểu đồ lịch sử giá đầu tư (per-holding) từ PriceSnapshot.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
 - Chưa có (đang chờ chọn task tiếp theo).
 
 ## Next
-- **Biểu đồ giá đầu tư theo thời gian** (đã có `PriceSnapshot`; Net Worth theo thời gian đã xong).
 - **Sửa/dừng-tạm giao dịch định kỳ** trong UI (hiện chỉ thêm/xoá).
 - **Nhắc lịch trả nợ / mục tiêu sắp đến hạn** trên Dashboard.
 

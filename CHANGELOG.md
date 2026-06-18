@@ -5,6 +5,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 ## 2026-06-19
 
 ### Added
+- **Biểu đồ lịch sử giá đầu tư** (trang Đầu tư): chọn mã → đường giá theo thời gian từ `PriceSnapshot` (Recharts).
 - **Authentication (opt-in)**: đăng nhập 1 mật khẩu qua `AUTH_PASSWORD`, cookie phiên ký HMAC (Web Crypto, không thêm dependency), middleware chặn route, nút Đăng xuất, cron bypass `?key=CRON_SECRET`.
 - **Import giao dịch từ CSV** (trang Import): tải file hoặc dán CSV; validate từng dòng, báo lỗi cụ thể, cập nhật số dư; parser CSV chuẩn RFC 4180.
 - **Giao dịch định kỳ** (trang Định kỳ): mẫu thu/chi/chuyển theo tần suất ngày/tuần/tháng; nút "Chạy ngay" + cron `/api/recurring/run` tự sinh giao dịch (đuổi kịp nhiều kỳ, tự dừng khi hết hạn).
