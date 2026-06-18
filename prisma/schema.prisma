@@ -211,6 +211,17 @@ model TripExpense {
   @@index([groupId])
 }
 
+// Snapshot tài sản ròng tại 1 thời điểm (1 bản/ngày) để vẽ Net Worth theo thời gian.
+model NetWorthSnapshot {
+  id          String   @id @default(cuid())
+  date        DateTime @unique @db.Date // chuẩn hoá theo ngày
+  totalCash   Decimal  @db.Decimal(18, 2)
+  totalInvest Decimal  @db.Decimal(18, 2)
+  totalDebt   Decimal  @db.Decimal(18, 2)
+  netWorth    Decimal  @db.Decimal(18, 2)
+  createdAt   DateTime @default(now())
+}
+
 // Mỗi dòng = số tiền 1 người phải chịu trong 1 chi phí
 model TripExpenseShare {
   id        String      @id @default(cuid())

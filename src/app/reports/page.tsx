@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/format";
 import { simulatePayoff, amortizingMonthlyPayment, type DebtForSim } from "@/lib/finance";
 import CashFlowChart, { type MonthPoint } from "./CashFlowChart";
+import NetWorthChart, { type NetWorthPoint } from "./NetWorthChart";
+import { snapshotNetWorth } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +21,13 @@ export default async function ReportsPage({
 }) {
   const sp = await searchParams;
   const extra = Math.max(Number(sp.extra ?? 0) || 0, 0);
+
+  // ----- Net Worth theo thời gian (snapshot) -----
+  const snapshots = await prisma.netWorthSnapshot.findMany({ orderBy: { date: "asc" }, take: 180 });
+  const nwSeries: NetWorthPoint[] = snapshots.map((s) => ({
+    date: `${s.date.getUTCDate()}/${s.date.getUTCMonth() + 1}`,
+    netWorth: Number(s.netWorth),
+  }));
 
   // ----- Dòng tiền tháng hiện tại -----
   const now = new Date();
@@ -93,6 +102,27 @@ export default async function ReportsPage({
   return (
     <div className="space-y-10">
       <h1 className="text-2xl font-semibold">Báo cáo</h1>
+
+      {/* Net Worth theo thời gian */}
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-lg font-medium text-gray-300">Net Worth theo thời gian</h2>
+          <form action={snapshotNetWorth}>
+            <button className="rounded-lg border border-emerald-500/40 px-3 py-1.5 text-sm text-emerald-400 hover:bg-emerald-500/10">
+              📌 Ghi lại Net Worth hôm nay
+            </button>
+          </form>
+        </div>
+        {nwSeries.length >= 2 ? (
+          <NetWorthChart data={nwSeries} />
+        ) : (
+          <p className="rounded-xl border border-dashed border-white/15 p-5 text-center text-sm text-gray-400">
+            {nwSeries.length === 0
+              ? "Chưa có dữ liệu. Bấm \"Ghi lại Net Worth hôm nay\" để bắt đầu theo dõi (mỗi ngày 1 điểm)."
+              : "Đã có 1 điểm. Ghi thêm vào những ngày sau để vẽ đường biến động."}
+          </p>
+        )}
+      </section>
 
       {/* Biểu đồ dòng tiền 6 tháng */}
       <section className="space-y-3">

@@ -42,6 +42,7 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 
 ## Xem báo cáo
 Vào **Báo cáo**:
+- **Net Worth theo thời gian**: bấm **📌 Ghi lại Net Worth hôm nay** để lưu 1 điểm (mỗi ngày 1 điểm). Sau ≥ 2 ngày, biểu đồ đường biến động tài sản ròng sẽ hiện. Có thể tự động hoá bằng cron gọi `/api/networth/snapshot` (xem `DEVELOPMENT.md`).
 - **Biểu đồ dòng tiền 6 tháng gần nhất**: cột Thu (xanh) / Chi (đỏ) theo tháng, di chuột để xem số tiền.
 - **Dòng tiền tháng**: Thu / Chi / Còn lại (tiết kiệm) tháng hiện tại.
 - **Chi theo danh mục**: tỷ lệ từng nhóm chi.

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
-import { netWorth } from "@/lib/finance";
+import { computeNetWorth } from "@/lib/networth";
 import { evaluateBudget } from "@/lib/budget";
 import { formatMoney, formatDate } from "@/lib/format";
 
@@ -27,10 +27,9 @@ export default async function DashboardPage() {
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const monthRange = { gte: monthStart, lt: monthEnd };
 
-  const [accounts, holdings, debts, monthAgg, budgets, spentByCat, recent] = await Promise.all([
-    prisma.account.findMany(),
-    prisma.holding.findMany({ include: { prices: { orderBy: { at: "desc" }, take: 1 } } }),
-    prisma.debt.findMany({ include: { payments: true } }),
+  const [nwb, accountCount, monthAgg, budgets, spentByCat, recent] = await Promise.all([
+    computeNetWorth(),
+    prisma.account.count(),
     prisma.transaction.groupBy({
       by: ["type"],
       where: { date: monthRange, type: { in: ["INCOME", "EXPENSE"] } },
@@ -49,20 +48,7 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  // Net Worth
-  const accountBalances = accounts.map((a) => Number(a.balance));
-  const holdingsForNW = holdings.map((h) => {
-    const latest = h.prices[0]?.price ?? h.avgCost;
-    return { quantity: Number(h.quantity), currentPrice: Number(latest) };
-  });
-  const debtsOutstanding = debts.map((d) => {
-    const paidPrincipal = d.payments.reduce((s, p) => s + Number(p.principal), 0);
-    return Math.max(Number(d.principal) - paidPrincipal, 0);
-  });
-  const totalCash = accountBalances.reduce((s, b) => s + b, 0);
-  const totalInvest = holdingsForNW.reduce((s, h) => s + h.quantity * h.currentPrice, 0);
-  const totalDebt = debtsOutstanding.reduce((s, d) => s + d, 0);
-  const nw = netWorth({ accountBalances, holdings: holdingsForNW, debtsOutstanding });
+  const { totalCash, totalInvest, totalDebt, netWorth: nw } = nwb;
 
   // Dòng tiền tháng
   const income = Number(monthAgg.find((r) => r.type === "INCOME")?._sum.amount ?? 0);
@@ -156,7 +142,7 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {accounts.length === 0 && (
+      {accountCount === 0 && (
         <p className="rounded-xl border border-dashed border-white/15 p-6 text-center text-gray-400">
           Chưa có tài khoản nào. Vào{" "}
           <a href="/accounts" className="text-emerald-400 underline">

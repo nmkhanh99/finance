@@ -32,6 +32,7 @@ src/
     finance.ts          # công thức tài chính (Net Worth, P&L, lãi, FV, payoff)
     split.ts            # chia tiền nhóm + phương án thanh toán
     budget.ts           # đánh giá ngân sách (spent vs limit)
+    networth.ts         # computeNetWorth + recordNetWorthSnapshot (Dashboard tái dùng)
     txFilter.ts         # buildTransactionWhere — lọc giao dịch dùng chung
     csv.ts              # xuất CSV an toàn (escape RFC 4180)
     format.ts           # format tiền/ngày (vi-VN)
@@ -90,6 +91,7 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 - `Debt` (principal, interestRate, SIMPLE|COMPOUND|AMORTIZING, termMonths, startDate) → `DebtPayment` (amount, principal, interest, date)
 - `Goal` (targetAmount, currentSaved, targetDate)
 - `Budget` (categoryId unique, limitAmount) — hạn mức chi/tháng theo danh mục
+- `NetWorthSnapshot` (date unique, totalCash/Invest/Debt, netWorth) — lịch sử Net Worth (1/ngày)
 
 **Chia tiền nhóm (độc lập):**
 - `TripGroup` → `TripMember`, `TripExpense`
