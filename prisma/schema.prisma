@@ -29,6 +29,8 @@ model Account {
 
   transactions     Transaction[] @relation("AccountTx")
   transfersFrom    Transaction[] @relation("FromAccount")
+  recurring        RecurringTransaction[] @relation("RecurringAccount")
+  recurringTo      RecurringTransaction[] @relation("RecurringToAccount")
 }
 
 enum TransactionType {
@@ -46,6 +48,7 @@ model Category {
 
   transactions Transaction[]
   budget       Budget?
+  recurrings   RecurringTransaction[]
 }
 
 // Hạn mức chi tiêu hằng tháng cho 1 danh mục (lặp lại mỗi tháng)
@@ -209,6 +212,34 @@ model TripExpense {
   shares TripExpenseShare[]
 
   @@index([groupId])
+}
+
+enum RecurrenceFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+// Mẫu giao dịch định kỳ — tự sinh Transaction theo lịch (lương, tiền nhà, subscription...).
+model RecurringTransaction {
+  id          String              @id @default(cuid())
+  type        TransactionType
+  amount      Decimal             @db.Decimal(18, 2)
+  account     Account             @relation("RecurringAccount", fields: [accountId], references: [id], onDelete: Cascade)
+  accountId   String
+  toAccount   Account?            @relation("RecurringToAccount", fields: [toAccountId], references: [id])
+  toAccountId String?
+  category    Category?           @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  note        String?
+  frequency   RecurrenceFrequency
+  startDate   DateTime
+  nextRun     DateTime // thời điểm sinh giao dịch kế tiếp
+  endDate     DateTime?
+  active      Boolean             @default(true)
+  createdAt   DateTime            @default(now())
+
+  @@index([active, nextRun])
 }
 
 // Snapshot tài sản ròng tại 1 thời điểm (1 bản/ngày) để vẽ Net Worth theo thời gian.

@@ -15,6 +15,7 @@
 - Dashboard tổng quan giàu thông tin (dòng tiền tháng, cảnh báo ngân sách, giao dịch gần đây).
 - Biểu đồ dòng tiền 6 tháng (Recharts) trên trang Báo cáo.
 - Net Worth theo thời gian (snapshot 1/ngày + biểu đồ đường + cron endpoint).
+- Giao dịch định kỳ (recurring: ngày/tuần/tháng, đuổi kịp, cron endpoint).
 - Dockerize (Postgres + app + migrate) qua docker-compose.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
@@ -25,7 +26,7 @@
 - **Authentication** (bắt buộc trước khi deploy public) — bảo vệ dữ liệu tài chính.
 - **Biểu đồ giá đầu tư theo thời gian** (đã có `PriceSnapshot`; Net Worth theo thời gian đã xong).
 - **Cron tự động snapshot Net Worth** trong Docker (hiện gọi `/api/networth/snapshot` thủ công).
-- **Recurring transactions** (giao dịch định kỳ: lương, tiền nhà, subscription).
+- **Import CSV** sao kê (bổ sung cho export đã có).
 - **Cron tự cập nhật giá** trong Docker (hiện cần gọi `/api/prices/refresh` thủ công).
 
 ## Later

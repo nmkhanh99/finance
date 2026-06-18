@@ -12,6 +12,7 @@ const NAV = [
   { href: "/accounts", label: "Tài khoản" },
   { href: "/transactions", label: "Giao dịch" },
   { href: "/categories", label: "Danh mục" },
+  { href: "/recurring", label: "Định kỳ" },
   { href: "/investments", label: "Đầu tư" },
   { href: "/debts", label: "Nợ / Vay" },
   { href: "/goals", label: "Mục tiêu" },

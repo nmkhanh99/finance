@@ -25,6 +25,14 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 
 **Tìm kiếm & lọc:** dùng thanh lọc để tìm theo **ghi chú**, lọc theo **loại / tài khoản / danh mục / tháng**. Dòng tổng kết hiển thị **số giao dịch khớp + tổng tiền**. Bấm **Xoá lọc** để về danh sách đầy đủ.
 
+## Giao dịch định kỳ
+1. Vào **Định kỳ**.
+2. Tạo mẫu: **Loại** (Thu/Chi/Chuyển), **Số tiền**, **Tần suất** (hằng ngày/tuần/tháng), **Tài khoản**, **Danh mục**, **Ngày bắt đầu**, và **Ngày kết thúc** (tuỳ chọn).
+3. Bấm **▶ Chạy ngay** để sinh các kỳ đã tới hạn (tự cộng/trừ số dư như giao dịch thường), hoặc đặt cron gọi `/api/recurring/run` để tự động.
+4. App tự "đuổi kịp" nhiều kỳ nếu lâu chưa chạy, và tự dừng khi quá ngày kết thúc.
+
+> Mốc thời gian tính theo UTC (nhất quán toàn app) — với giờ VN, kỳ trong ngày sẽ sinh sau ~07:00 sáng.
+
 ## Quản lý danh mục
 - App seed sẵn các danh mục (Lương, Thưởng, Ăn uống, Đi lại, Nhà ở/Hoá đơn...).
 - Vào **Danh mục** để: thêm danh mục mới (tên + loại Thu/Chi), **sửa tên** (đổi rồi bấm Lưu), **xoá**. Mỗi danh mục hiển thị số giao dịch đang dùng.

@@ -2,7 +2,8 @@
 
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { TransactionType, Prisma } from "@prisma/client";
+import { TransactionType } from "@prisma/client";
+import { applyTransaction } from "@/lib/txCore";
 
 export async function createTransaction(formData: FormData) {
   const type = String(formData.get("type") ?? "EXPENSE") as TransactionType;
@@ -17,30 +18,10 @@ export async function createTransaction(formData: FormData) {
   if (type === "TRANSFER" && (!toAccountId || toAccountId === accountId)) return;
 
   const date = dateStr ? new Date(dateStr) : new Date();
-  const amt = new Prisma.Decimal(amount);
 
-  await prisma.$transaction(async (tx) => {
-    await tx.transaction.create({
-      data: {
-        type,
-        amount: amt,
-        date,
-        note,
-        accountId,
-        toAccountId: type === "TRANSFER" ? toAccountId : null,
-        categoryId: type === "TRANSFER" ? null : categoryId,
-      },
-    });
-
-    if (type === "INCOME") {
-      await tx.account.update({ where: { id: accountId }, data: { balance: { increment: amt } } });
-    } else if (type === "EXPENSE") {
-      await tx.account.update({ where: { id: accountId }, data: { balance: { decrement: amt } } });
-    } else {
-      await tx.account.update({ where: { id: accountId }, data: { balance: { decrement: amt } } });
-      await tx.account.update({ where: { id: toAccountId! }, data: { balance: { increment: amt } } });
-    }
-  });
+  await prisma.$transaction((tx) =>
+    applyTransaction(tx, { type, amount, date, note, accountId, toAccountId, categoryId }),
+  );
 
   revalidatePath("/transactions");
   revalidatePath("/accounts");
