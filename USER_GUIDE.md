@@ -47,7 +47,12 @@ Vào **Báo cáo**:
 Ngoài ra **Tổng quan** hiển thị Net Worth + phân bổ Tiền mặt / Đầu tư / Dư nợ.
 
 ## Tạo ngân sách
-**Ngân sách có hạn mức + cảnh báo vượt: Chưa có.** Hiện chỉ có *báo cáo chi theo danh mục* ở trang Báo cáo. Tính năng đặt hạn mức sẽ bổ sung sau (xem `ROADMAP.md`).
+1. Vào **Ngân sách**.
+2. Với mỗi danh mục Chi, nhập **Hạn mức/tháng** rồi bấm **Lưu** (để trống / 0 để bỏ ngân sách).
+3. App hiển thị **đã chi tháng này / hạn mức**, thanh tiến độ (xanh < 80%, vàng ≥ 80%, đỏ khi vượt) và số tiền **còn lại** hoặc **vượt**.
+4. Đầu trang có cảnh báo **"⚠️ N danh mục vượt ngân sách"** nếu có danh mục vượt.
+
+Ngân sách lặp lại mỗi tháng (so sánh với chi tiêu của tháng hiện tại).
 
 ## Theo dõi mục tiêu tiết kiệm
 1. Vào **Mục tiêu**, nhập **Tên**, **Số tiền cần**, **Đã có**, **Hạn đạt được**.

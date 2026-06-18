@@ -5,6 +5,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 ## 2026-06-19
 
 ### Added
+- **Ngân sách theo tháng** (trang Ngân sách): đặt hạn mức/tháng cho danh mục Chi; thanh tiến độ đã-chi/hạn-mức (xanh/vàng/đỏ); **cảnh báo vượt ngân sách** + đếm số danh mục vượt.
 - **Quản lý danh mục** (trang Danh mục): thêm / sửa tên / xoá danh mục Thu-Chi; hiển thị số giao dịch mỗi danh mục; xoá an toàn (gỡ nhãn khỏi giao dịch, không mất giao dịch).
 - Dashboard **Tổng quan**: tài sản ròng (Net Worth) + phân bổ Tiền mặt / Đầu tư / Dư nợ.
 - **Tài khoản**: CRUD ví tiền mặt / ngân hàng, cập nhật số dư.
@@ -27,7 +28,8 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 - Khởi tạo Next.js 15 + TypeScript + Tailwind v4 + Prisma 6 + PostgreSQL + Vitest.
 - Migration `init`: Account, Category, Transaction, Holding, PriceSnapshot, Debt, DebtPayment, Goal.
 - Migration `trip_split`: TripGroup, TripMember, TripExpense, TripExpenseShare.
-- `src/lib/finance.ts` + 17 unit test; `src/lib/split.ts` + 6 unit test (tổng 23 test pass).
+- Migration `budget`: model `Budget` (hạn mức/tháng theo danh mục); `src/lib/budget.ts` + 4 unit test.
+- `src/lib/finance.ts` + 17 unit test; `src/lib/split.ts` + 6 unit test (tổng 27 test pass).
 - Tiền lưu bằng `Decimal` (không dùng float).
 - Dockerize: `Dockerfile` (multi-stage, Next standalone), `docker-compose.yml` (Postgres + migrate + web), `.dockerignore`, `.env.example`, `DOCKER.md`.
 - Thêm rule `documentation-maintenance` (bắt buộc duy trì tài liệu trước khi commit).

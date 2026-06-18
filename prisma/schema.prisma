@@ -45,6 +45,18 @@ model Category {
   createdAt DateTime        @default(now())
 
   transactions Transaction[]
+  budget       Budget?
+}
+
+// Hạn mức chi tiêu hằng tháng cho 1 danh mục (lặp lại mỗi tháng)
+model Budget {
+  id          String   @id @default(cuid())
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  String   @unique
+  limitAmount Decimal  @db.Decimal(18, 2)
+  currency    String   @default("VND")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Transaction {

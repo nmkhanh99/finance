@@ -86,6 +86,7 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 - `Holding` (symbol, STOCK|CRYPTO, quantity, avgCost) → `PriceSnapshot` (price, at)
 - `Debt` (principal, interestRate, SIMPLE|COMPOUND|AMORTIZING, termMonths, startDate) → `DebtPayment` (amount, principal, interest, date)
 - `Goal` (targetAmount, currentSaved, targetDate)
+- `Budget` (categoryId unique, limitAmount) — hạn mức chi/tháng theo danh mục
 
 **Chia tiền nhóm (độc lập):**
 - `TripGroup` → `TripMember`, `TripExpense`
