@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { computeNetWorth } from "@/lib/networth";
 import { evaluateBudget } from "@/lib/budget";
+import { addMonths, daysBetween, dueStatus } from "@/lib/reminders";
 import { formatMoney, formatDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +28,7 @@ export default async function DashboardPage() {
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const monthRange = { gte: monthStart, lt: monthEnd };
 
-  const [nwb, accountCount, monthAgg, budgets, spentByCat, recent] = await Promise.all([
+  const [nwb, accountCount, monthAgg, budgets, spentByCat, recent, debts, goals] = await Promise.all([
     computeNetWorth(),
     prisma.account.count(),
     prisma.transaction.groupBy({
@@ -46,9 +47,28 @@ export default async function DashboardPage() {
       take: 5,
       include: { account: true, toAccount: true, category: true },
     }),
+    prisma.debt.findMany({ include: { payments: true } }),
+    prisma.goal.findMany(),
   ]);
 
   const { totalCash, totalInvest, totalDebt, netWorth: nw } = nwb;
+
+  // Nhắc nhở: nợ còn dư sắp đáo hạn + mục tiêu chưa đạt sắp đến hạn (trong 30 ngày / quá hạn)
+  interface Reminder { label: string; due: Date; days: number; status: "overdue" | "soon"; href: string }
+  const reminders: Reminder[] = [];
+  for (const d of debts) {
+    const paid = d.payments.reduce((s, p) => s + Number(p.principal), 0);
+    if (Number(d.principal) - paid <= 0) continue; // đã trả hết
+    const due = addMonths(d.startDate, d.termMonths);
+    const st = dueStatus(due, now);
+    if (st !== "upcoming") reminders.push({ label: `Nợ "${d.name}" đáo hạn`, due, days: daysBetween(now, due), status: st, href: "/debts" });
+  }
+  for (const g of goals) {
+    if (Number(g.currentSaved) >= Number(g.targetAmount)) continue; // đã đạt
+    const st = dueStatus(g.targetDate, now);
+    if (st !== "upcoming") reminders.push({ label: `Mục tiêu "${g.name}"`, due: g.targetDate, days: daysBetween(now, g.targetDate), status: st, href: "/goals" });
+  }
+  reminders.sort((a, b) => a.due.getTime() - b.due.getTime());
 
   // Dòng tiền tháng
   const income = Number(monthAgg.find((r) => r.type === "INCOME")?._sum.amount ?? 0);
@@ -101,6 +121,30 @@ export default async function DashboardPage() {
         >
           ⚠️ {overCount} danh mục đang vượt ngân sách tháng này — xem chi tiết →
         </Link>
+      )}
+
+      {/* Nhắc nhở đến hạn */}
+      {reminders.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-sm text-gray-400">⏰ Nhắc nhở</h2>
+          {reminders.map((r, i) => (
+            <Link
+              key={i}
+              href={r.href}
+              className={`flex items-center justify-between rounded-xl border px-4 py-2.5 text-sm hover:bg-white/5 ${
+                r.status === "overdue"
+                  ? "border-red-500/40 bg-red-500/10 text-red-300"
+                  : "border-amber-500/40 bg-amber-500/10 text-amber-200"
+              }`}
+            >
+              <span>{r.label}</span>
+              <span className="text-xs">
+                {formatDate(r.due)} ·{" "}
+                {r.status === "overdue" ? `quá hạn ${-r.days} ngày` : `còn ${r.days} ngày`}
+              </span>
+            </Link>
+          ))}
+        </div>
       )}
 
       {/* Giao dịch gần đây */}

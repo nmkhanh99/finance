@@ -21,6 +21,7 @@
 - Dockerize (Postgres + app + migrate) qua docker-compose.
 - Cron tự động trong Docker (giá / recurring / snapshot Net Worth).
 - Biểu đồ lịch sử giá đầu tư (per-holding) từ PriceSnapshot.
+- Nhắc khoản nợ / mục tiêu sắp đến hạn trên Dashboard.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
@@ -28,7 +29,7 @@
 
 ## Next
 - **Sửa/dừng-tạm giao dịch định kỳ** trong UI (hiện chỉ thêm/xoá).
-- **Nhắc lịch trả nợ / mục tiêu sắp đến hạn** trên Dashboard.
+- **Nhắc qua email/push** (hiện chỉ nhắc trong app).
 
 ## Later
 - Map cột CSV linh hoạt khi import sao kê ngân hàng (định dạng khác nhau giữa ngân hàng).

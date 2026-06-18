@@ -37,6 +37,7 @@ src/
     txCore.ts           # applyTransaction — tạo giao dịch + cập nhật số dư (dùng chung)
     recurring.ts        # nextOccurrence (tần suất, pure)
     recurringRun.ts     # runDueRecurring — sinh giao dịch định kỳ tới hạn
+    reminders.ts        # addMonths/daysBetween/dueStatus — nhắc đến hạn
     txFilter.ts         # buildTransactionWhere — lọc giao dịch dùng chung
     csv.ts              # xuất CSV an toàn (escape RFC 4180)
     csvParse.ts         # parse CSV (RFC 4180) cho import
