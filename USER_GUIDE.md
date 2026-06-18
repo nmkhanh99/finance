@@ -28,8 +28,7 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 ## Đa tiền tệ & tỷ giá
 - Tiền tệ gốc là **VND**. Khi tạo Tài khoản hoặc khoản Đầu tư, có thể nhập **mã tiền tệ** khác (vd `USD`).
 - Vào **Tỷ giá** để đặt **1 đơn vị ngoại tệ = bao nhiêu VND** (vd USD = 25000).
-- **Net Worth** và **tổng tài khoản/đầu tư** tự **quy đổi mọi tiền tệ về VND** theo tỷ giá. Số dư/giá từng dòng vẫn hiển thị theo tiền tệ gốc của nó.
-- Lưu ý: Báo cáo dòng tiền & Ngân sách hiện cộng theo số tiền giao dịch chưa quy đổi — phù hợp khi chi tiêu cùng một tiền tệ.
+- **Net Worth**, **tổng tài khoản/đầu tư**, **dòng tiền (Báo cáo & Dashboard)** và **ngân sách** đều **quy đổi mọi tiền tệ về VND** theo tỷ giá. Số dư/giá từng dòng vẫn hiển thị theo tiền tệ gốc của nó.
 
 ## Đăng nhập & bảo mật
 - Mặc định app **không yêu cầu đăng nhập** (tiện chạy local một mình).

@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/format";
 import { simulatePayoff, amortizingMonthlyPayment, type DebtForSim } from "@/lib/finance";
+import { convertToBase } from "@/lib/currency";
+import { loadRates } from "@/lib/rates";
 import CashFlowChart, { type MonthPoint } from "./CashFlowChart";
 import NetWorthChart, { type NetWorthPoint } from "./NetWorthChart";
 import { snapshotNetWorth } from "./actions";
@@ -21,6 +23,7 @@ export default async function ReportsPage({
 }) {
   const sp = await searchParams;
   const extra = Math.max(Number(sp.extra ?? 0) || 0, 0);
+  const rates = await loadRates(); // số tiền quy đổi về VND theo tiền tệ tài khoản
 
   // ----- Net Worth theo thời gian (snapshot) -----
   const snapshots = await prisma.netWorthSnapshot.findMany({ orderBy: { date: "asc" }, take: 180 });
@@ -35,14 +38,14 @@ export default async function ReportsPage({
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const txs = await prisma.transaction.findMany({
     where: { date: { gte: monthStart, lt: monthEnd }, type: { in: ["INCOME", "EXPENSE"] } },
-    include: { category: true },
+    include: { category: true, account: { select: { currency: true } } },
   });
 
   let income = 0;
   let expense = 0;
   const byCategory = new Map<string, number>();
   for (const t of txs) {
-    const amt = Number(t.amount);
+    const amt = convertToBase(Number(t.amount), t.account.currency, rates);
     if (t.type === "INCOME") income += amt;
     else {
       expense += amt;
@@ -58,7 +61,7 @@ export default async function ReportsPage({
   const chartStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
   const recentTxs = await prisma.transaction.findMany({
     where: { date: { gte: chartStart, lt: monthEnd }, type: { in: ["INCOME", "EXPENSE"] } },
-    select: { type: true, amount: true, date: true },
+    select: { type: true, amount: true, date: true, account: { select: { currency: true } } },
   });
   const months: MonthPoint[] = [];
   const monthIndex = new Map<string, number>();
@@ -72,8 +75,9 @@ export default async function ReportsPage({
     const key = `${t.date.getFullYear()}-${t.date.getMonth()}`;
     const idx = monthIndex.get(key);
     if (idx === undefined) continue;
-    if (t.type === "INCOME") months[idx].thu += Number(t.amount);
-    else months[idx].chi += Number(t.amount);
+    const amt = convertToBase(Number(t.amount), t.account.currency, rates);
+    if (t.type === "INCOME") months[idx].thu += amt;
+    else months[idx].chi += amt;
   }
 
   // ----- Trả nợ: Avalanche vs Snowball -----

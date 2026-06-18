@@ -39,6 +39,7 @@ src/
     recurringRun.ts     # runDueRecurring — sinh giao dịch định kỳ tới hạn
     reminders.ts        # addMonths/daysBetween/dueStatus — nhắc đến hạn
     currency.ts         # convertToBase — quy đổi đa tiền tệ về VND
+    rates.ts            # loadRates — nạp bảng tỷ giá (server)
     txFilter.ts         # buildTransactionWhere — lọc giao dịch dùng chung
     csv.ts              # xuất CSV an toàn (escape RFC 4180)
     csvParse.ts         # parse CSV (RFC 4180) cho import

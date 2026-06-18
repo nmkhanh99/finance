@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { computeNetWorth } from "@/lib/networth";
 import { evaluateBudget } from "@/lib/budget";
+import { convertToBase } from "@/lib/currency";
+import { loadRates } from "@/lib/rates";
 import { addMonths, daysBetween, dueStatus } from "@/lib/reminders";
 import { formatMoney, formatDate } from "@/lib/format";
 
@@ -28,20 +30,14 @@ export default async function DashboardPage() {
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const monthRange = { gte: monthStart, lt: monthEnd };
 
-  const [nwb, accountCount, monthAgg, budgets, spentByCat, recent, debts, goals] = await Promise.all([
+  const [nwb, accountCount, monthTxs, budgets, recent, debts, goals, rates] = await Promise.all([
     computeNetWorth(),
     prisma.account.count(),
-    prisma.transaction.groupBy({
-      by: ["type"],
+    prisma.transaction.findMany({
       where: { date: monthRange, type: { in: ["INCOME", "EXPENSE"] } },
-      _sum: { amount: true },
+      select: { type: true, amount: true, categoryId: true, account: { select: { currency: true } } },
     }),
     prisma.budget.findMany(),
-    prisma.transaction.groupBy({
-      by: ["categoryId"],
-      where: { type: "EXPENSE", date: monthRange },
-      _sum: { amount: true },
-    }),
     prisma.transaction.findMany({
       orderBy: { date: "desc" },
       take: 5,
@@ -49,6 +45,7 @@ export default async function DashboardPage() {
     }),
     prisma.debt.findMany({ include: { payments: true } }),
     prisma.goal.findMany(),
+    loadRates(),
   ]);
 
   const { totalCash, totalInvest, totalDebt, netWorth: nw } = nwb;
@@ -70,14 +67,21 @@ export default async function DashboardPage() {
   }
   reminders.sort((a, b) => a.due.getTime() - b.due.getTime());
 
-  // Dòng tiền tháng
-  const income = Number(monthAgg.find((r) => r.type === "INCOME")?._sum.amount ?? 0);
-  const expense = Number(monthAgg.find((r) => r.type === "EXPENSE")?._sum.amount ?? 0);
+  // Dòng tiền tháng + chi theo danh mục (quy đổi về VND theo tiền tệ tài khoản)
+  let income = 0;
+  let expense = 0;
+  const spentMap = new Map<string, number>();
+  for (const t of monthTxs) {
+    const amt = convertToBase(Number(t.amount), t.account.currency, rates);
+    if (t.type === "INCOME") income += amt;
+    else {
+      expense += amt;
+      if (t.categoryId) spentMap.set(t.categoryId, (spentMap.get(t.categoryId) ?? 0) + amt);
+    }
+  }
   const monthNet = income - expense;
 
   // Cảnh báo ngân sách
-  const spentMap = new Map<string, number>();
-  for (const r of spentByCat) if (r.categoryId) spentMap.set(r.categoryId, Number(r._sum.amount ?? 0));
   const overCount = budgets.filter(
     (b) => evaluateBudget(Number(b.limitAmount), spentMap.get(b.categoryId) ?? 0).isOver,
   ).length;

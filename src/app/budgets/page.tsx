@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/format";
 import { evaluateBudget } from "@/lib/budget";
+import { convertToBase } from "@/lib/currency";
+import { loadRates } from "@/lib/rates";
 import { setBudget } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -10,22 +12,25 @@ export default async function BudgetsPage() {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-  const [categories, spentByCat] = await Promise.all([
+  const [categories, monthTxs, rates] = await Promise.all([
     prisma.category.findMany({
       where: { type: "EXPENSE" },
       orderBy: { name: "asc" },
       include: { budget: true },
     }),
-    prisma.transaction.groupBy({
-      by: ["categoryId"],
+    prisma.transaction.findMany({
       where: { type: "EXPENSE", date: { gte: monthStart, lt: monthEnd } },
-      _sum: { amount: true },
+      select: { categoryId: true, amount: true, account: { select: { currency: true } } },
     }),
+    loadRates(),
   ]);
 
+  // Chi tiêu mỗi danh mục, quy đổi về VND theo tiền tệ tài khoản
   const spentMap = new Map<string, number>();
-  for (const row of spentByCat) {
-    if (row.categoryId) spentMap.set(row.categoryId, Number(row._sum.amount ?? 0));
+  for (const t of monthTxs) {
+    if (!t.categoryId) continue;
+    const amt = convertToBase(Number(t.amount), t.account.currency, rates);
+    spentMap.set(t.categoryId, (spentMap.get(t.categoryId) ?? 0) + amt);
   }
 
   const rows = categories.map((c) => {

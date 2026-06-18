@@ -23,16 +23,16 @@
 - Biểu đồ lịch sử giá đầu tư (per-holding) từ PriceSnapshot.
 - Nhắc khoản nợ / mục tiêu sắp đến hạn trên Dashboard.
 - Sửa & tạm dừng/tiếp tục giao dịch định kỳ trong UI.
-- Đa tiền tệ (VND base + tỷ giá); Net Worth quy đổi.
+- Đa tiền tệ (VND base + tỷ giá); Net Worth + dòng tiền + ngân sách quy đổi.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
 - Chưa có (đang chờ chọn task tiếp theo).
 
 ## Next
-- **Quy đổi tiền tệ trong Báo cáo & Ngân sách** (hiện Net Worth đã quy đổi, cashflow/budget thì chưa).
-- **Nhắc qua email/push** (hiện chỉ nhắc trong app).
 - **Tự cập nhật tỷ giá** từ API (hiện nhập tay).
+- **Nhắc qua email/push** (hiện chỉ nhắc trong app).
+- **Quy đổi tiền tệ cho phần chia tiền nhóm** (hiện giả định cùng tiền tệ).
 
 ## Later
 - Map cột CSV linh hoạt khi import sao kê ngân hàng (định dạng khác nhau giữa ngân hàng).

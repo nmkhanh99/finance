@@ -28,6 +28,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 - Tài liệu dự án: `DEVELOPMENT.md`, `USER_GUIDE.md`, `CHANGELOG.md`, `ROADMAP.md`.
 
 ### Changed
+- **Dòng tiền (Báo cáo + Dashboard) & Ngân sách** giờ quy đổi mỗi giao dịch về VND theo tiền tệ tài khoản (trước đây cộng thô). Thêm `src/lib/rates.ts` (`loadRates`).
 - **Giao dịch định kỳ** thêm Tạm dừng/Tiếp tục (active) và Sửa (số tiền, tần suất, ngày kỳ tới, ngày kết thúc, ghi chú).
 - **Dashboard Tổng quan** bổ sung: dòng tiền tháng (thu/chi/còn lại), cảnh báo vượt ngân sách, 5 giao dịch gần đây.
 - Nút cập nhật giá đổi từ "Cập nhật giá crypto" → "Cập nhật giá" (gộp crypto + chứng khoán VN).
