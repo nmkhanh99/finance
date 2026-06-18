@@ -139,3 +139,8 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 
 ## 13. Scripts & lệnh
 `dev`, `build`, `start`, `lint`, `test`, `test:watch`, `db:migrate`, `db:generate`, `db:studio`, `db:seed`. Docker: `docker compose up -d --build`.
+
+## 14. Biến môi trường & cron
+- `DATABASE_URL` — kết nối Postgres (bắt buộc).
+- `AUTH_PASSWORD` — đặt để bật auth (bỏ trống = tắt). `AUTH_SECRET` — ký cookie phiên. `CRON_SECRET` — cho cron gọi `/api/*` qua `?key=`.
+- **Cron tự động (Docker):** service `cron` chạy `docker/cron.sh` (busybox crond) gọi `/api/prices/refresh` (15 phút), `/api/recurring/run` & `/api/networth/snapshot` (hằng ngày). Chạy thủ công ngoài Docker: đặt crontab gọi `curl` tới các endpoint đó (xem comment trong mỗi route).
