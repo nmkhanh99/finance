@@ -34,6 +34,7 @@
 - Nhắc qua **Web Push** (service worker + VAPID, `web-push`): `PushSubscription` + bật/tắt theo thiết bị + cron `/api/reminders/push`.
 - Lint (ESLint flat config `next/core-web-vitals` + TS) chạy sạch; hạ tầng test UI (vitest + jsdom + Testing Library) + test mẫu ThemeToggle.
 - Ngày-chỉ chuyển sang `@db.Date` (UTC-midnight): hết lệch +7h. Helper `dateOnly.ts`, mọi chỗ ghi/lọc/nhóm/hiển thị dùng UTC nhất quán.
+- Import sao kê ngân hàng map cột linh hoạt (`importBank.ts`): chọn tài khoản + map Ngày/Số tiền (1 cột hoặc Nợ-Có)/Nội dung; parser số & ngày đa định dạng.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
@@ -44,7 +45,6 @@
 
 ## Later
 - **Bảo mật đăng nhập thật (Keycloak/OIDC)**: hiện chỉ nhập username không mật khẩu. Cắm IdP qua `User.externalId` (map `sub`) + đổi thân `getCurrentUserId()` trong `src/lib/currentUser.ts` — không phải sửa query. Kèm: trang quản lý user / đổi username, xoá user.
-- Map cột CSV linh hoạt khi import sao kê ngân hàng (định dạng khác nhau giữa ngân hàng).
 - Mở rộng danh sách mã crypto hỗ trợ / nhập `priceId` tùy chỉnh.
 
 ## Technical Debt

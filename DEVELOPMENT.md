@@ -36,6 +36,7 @@ src/
     currentUser.ts      # getCurrentUserId/requireUserId — SEAM resolve user (đổi 1 chỗ khi cắm IdP)
     userSetup.ts        # seedDefaultCategories — seed danh mục cho user mới
     dateOnly.ts         # ngày-chỉ UTC-midnight (parseDateInput/monthStartUTC) — khớp @db.Date
+    importBank.ts       # import sao kê: parseAmount/parseFlexibleDate/validateBankRows (map cột)
     reminders.ts        # buildReminders + tiện ích ngày (Dashboard & email dùng chung)
     email.ts            # gửi email SMTP (nodemailer) + HTML nhắc nhở
     push.ts             # Web Push (web-push + VAPID) + payload nhắc nhở

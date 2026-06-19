@@ -1,23 +1,28 @@
-import ImportForm from "./ImportForm";
+import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/currentUser";
+import ImportTabs from "./ImportTabs";
 
 export const dynamic = "force-dynamic";
 
-export default function ImportPage() {
+export default async function ImportPage() {
+  const userId = await requireUserId();
+  const accounts = await prisma.account.findMany({
+    where: { userId },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Import giao dịch (CSV)</h1>
 
       <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-        <p>Định dạng cột (có thể có dòng tiêu đề): <code className="rounded bg-black/5 dark:bg-white/10 px-1">date, type, amount, currency, account, to_account, category, note</code></p>
-        <ul className="list-inside list-disc text-xs text-gray-600 dark:text-gray-500">
-          <li><b>date</b>: YYYY-MM-DD · <b>type</b>: Thu/Chi/Chuyển (hoặc INCOME/EXPENSE/TRANSFER)</li>
-          <li><b>amount</b>: số nguyên VND (vd 50000) · <b>account</b>/<b>to_account</b>/<b>category</b>: khớp theo tên đã có</li>
-          <li>Giao dịch import sẽ <b>cập nhật số dư tài khoản</b> như nhập tay. Dòng lỗi được bỏ qua và liệt kê.</li>
-        </ul>
-        <p className="text-xs">Mẹo: dùng nút <b>Xuất CSV</b> ở trang Giao dịch để có file mẫu đúng định dạng.</p>
+        <p><b>Sao kê ngân hàng</b>: tải file CSV của bất kỳ ngân hàng nào → chọn tài khoản đích và <b>tự map cột</b> (Ngày, Số tiền hoặc Nợ/Có, Nội dung). Tự nhận số kiểu <code className="rounded bg-black/5 dark:bg-white/10 px-1">1.000.000</code>/<code className="rounded bg-black/5 dark:bg-white/10 px-1">1,000,000</code> và ngày DD/MM/YYYY.</p>
+        <p><b>Định dạng app</b>: file đúng cột <code className="rounded bg-black/5 dark:bg-white/10 px-1">date, type, amount, currency, account, to_account, category, note</code> (dùng nút <b>Xuất CSV</b> ở trang Giao dịch để có mẫu).</p>
+        <p className="text-xs text-gray-600 dark:text-gray-500">Giao dịch import <b>cập nhật số dư tài khoản</b>. Dòng lỗi được bỏ qua &amp; liệt kê.</p>
       </div>
 
-      <ImportForm />
+      <ImportTabs accounts={accounts} />
     </div>
   );
 }
