@@ -37,6 +37,7 @@ src/
     userSetup.ts        # seedDefaultCategories — seed danh mục cho user mới
     reminders.ts        # buildReminders + tiện ích ngày (Dashboard & email dùng chung)
     email.ts            # gửi email SMTP (nodemailer) + HTML nhắc nhở
+    push.ts             # Web Push (web-push + VAPID) + payload nhắc nhở
     networth.ts         # computeNetWorth(userId) + recordNetWorthSnapshot(userId)
     txCore.ts           # applyTransaction — tạo giao dịch + cập nhật số dư (dùng chung)
     recurring.ts        # nextOccurrence (tần suất, pure)
@@ -98,7 +99,7 @@ Quy ước: **viết test cho công thức tài chính trước khi làm UI**. M
 PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 
 **Người dùng:**
-- `User` (username unique, email? — nhận nhắc email, externalId? — để map IdP/Keycloak sau). Mọi bảng cá nhân bên dưới có `userId` (FK, onDelete Cascade); dữ liệu cách ly theo user. `ExchangeRate` là GLOBAL (không có userId).
+- `User` (username unique, email? — nhận nhắc email, externalId? — để map IdP/Keycloak sau) → `PushSubscription` (endpoint unique, p256dh, auth) cho Web Push. Mọi bảng cá nhân bên dưới có `userId` (FK, onDelete Cascade); dữ liệu cách ly theo user. `ExchangeRate` là GLOBAL (không có userId).
 
 **Tài chính cá nhân (đều có `userId`):**
 - `Account` (CASH|BANK, balance, currency)
@@ -160,4 +161,5 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 - `DATABASE_URL` — kết nối Postgres (bắt buộc).
 - `AUTH_SECRET` — ký cookie phiên (bỏ trống = secret mặc định không an toàn, chỉ cho local). `CRON_SECRET` — cho cron gọi `/api/*` qua `?key=`. (Đăng nhập bằng username, không còn `AUTH_PASSWORD`.)
 - `SMTP_HOST/PORT/SECURE/USER/PASS/FROM` — bật & cấu hình gửi email nhắc nhở (nodemailer). Mỗi user đặt `email` ở trang Cài đặt; cron `/api/reminders/email` (07:00) gửi cho mọi user có email. Bỏ trống = tắt email.
-- **Cron tự động (Docker):** service `cron` chạy `docker/cron.sh` (busybox crond) gọi `/api/prices/refresh` (15 phút), `/api/recurring/run`, `/api/networth/snapshot`, `/api/rates/refresh` & `/api/reminders/email` (hằng ngày). Chạy thủ công ngoài Docker: đặt crontab gọi `curl` tới các endpoint đó (xem comment trong mỗi route).
+- `VAPID_PUBLIC_KEY/PRIVATE_KEY/SUBJECT` — bật Web Push (`npx web-push generate-vapid-keys`). Cần HTTPS/localhost; mỗi thiết bị tự đăng ký ở Cài đặt (service worker `public/sw.js`); cron `/api/reminders/push` (07:05). Middleware cho `/sw.js` truy cập công khai.
+- **Cron tự động (Docker):** service `cron` chạy `docker/cron.sh` (busybox crond) gọi `/api/prices/refresh` (15 phút), `/api/recurring/run`, `/api/networth/snapshot`, `/api/rates/refresh`, `/api/reminders/email` & `/api/reminders/push` (hằng ngày). Chạy thủ công ngoài Docker: đặt crontab gọi `curl` tới các endpoint đó (xem comment trong mỗi route).

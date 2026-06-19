@@ -26,6 +26,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // chặn mọi route trừ tài nguyên tĩnh của Next
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // chặn mọi route trừ tài nguyên tĩnh của Next + service worker (phải truy cập công khai)
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw.js).*)"],
 };

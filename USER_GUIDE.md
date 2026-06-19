@@ -43,6 +43,11 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 - Trang Cài đặt cho biết **SMTP đã cấu hình hay chưa**. Nếu chưa, người quản trị cần đặt biến môi trường `SMTP_HOST`, `SMTP_PORT` (và `SMTP_USER`/`SMTP_PASS`/`SMTP_FROM`) — xem `.env.example`. Với Gmail: bật **App Password** và dùng làm `SMTP_PASS`.
 - Nút **Gửi thử ngay** để kiểm tra cấu hình (gửi email tới chính bạn). Để trống ô email = tắt nhắc.
 
+### Thông báo đẩy (Web Push)
+- Cùng trang **⚙ Cài đặt** → mục **Thông báo đẩy**: bấm **Bật thông báo đẩy trên thiết bị này**, cho phép quyền thông báo của trình duyệt. Khi đó bạn nhận thông báo nhắc đến hạn ngay trên trình duyệt, kể cả khi không mở app.
+- Bật **riêng từng thiết bị/trình duyệt**. Nút **Gửi thử** để kiểm tra.
+- Yêu cầu: chạy qua **HTTPS** (hoặc localhost) và người quản trị đã tạo khoá VAPID (`npx web-push generate-vapid-keys`) đặt vào `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` — xem `.env.example`. Nếu chưa cấu hình, trang sẽ báo "VAPID chưa cấu hình".
+
 ## Giao dịch định kỳ
 1. Vào **Định kỳ**.
 2. Tạo mẫu: **Loại** (Thu/Chi/Chuyển), **Số tiền**, **Tần suất** (hằng ngày/tuần/tháng), **Tài khoản**, **Danh mục**, **Ngày bắt đầu**, và **Ngày kết thúc** (tuỳ chọn).

@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/currentUser";
 import { emailEnabled } from "@/lib/email";
+import { pushEnabled } from "@/lib/push";
 import { updateEmail, sendTestReminder } from "./actions";
+import PushToggle from "./PushToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +12,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const sp = await searchParams;
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { username: true, email: true } });
   const smtp = emailEnabled();
+  const push = pushEnabled();
 
   return (
     <div className="max-w-xl space-y-8">
@@ -59,6 +62,22 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             Đặt biến môi trường <code>SMTP_HOST</code>, <code>SMTP_PORT</code> (và <code>SMTP_USER</code>/<code>SMTP_PASS</code>/<code>SMTP_FROM</code>) — xem <code>.env.example</code> — rồi khởi động lại app.
           </p>
         )}
+      </section>
+
+      <section className="space-y-3 rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-5">
+        <h2 className="font-medium text-gray-700 dark:text-gray-300">Thông báo đẩy (Web Push)</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Nhận thông báo nhắc nợ/mục tiêu đến hạn ngay trên trình duyệt (kể cả khi không mở app). Bật riêng trên từng thiết bị.
+        </p>
+        <div className="flex items-center gap-3 text-sm">
+          <span className={push ? "text-emerald-400" : "text-amber-400"}>
+            {push ? "● VAPID đã cấu hình" : "● VAPID chưa cấu hình"}
+          </span>
+        </div>
+        <PushToggle />
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Cần HTTPS (hoặc localhost) và server đặt <code>VAPID_PUBLIC_KEY</code>/<code>VAPID_PRIVATE_KEY</code> (tạo bằng <code>npx web-push generate-vapid-keys</code>) — xem <code>.env.example</code>.
+        </p>
       </section>
     </div>
   );

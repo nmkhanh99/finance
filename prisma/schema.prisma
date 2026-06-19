@@ -30,6 +30,20 @@ model User {
   recurrings    RecurringTransaction[]
   netWorthSnaps NetWorthSnapshot[]
   tripGroups    TripGroup[]
+  pushSubs      PushSubscription[]
+}
+
+// Đăng ký Web Push của trình duyệt (1 user có thể có nhiều thiết bị/trình duyệt).
+model PushSubscription {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  endpoint  String   @unique
+  p256dh    String // khoá công khai client (để mã hoá payload)
+  auth      String // secret auth của subscription
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 // ----- Tài khoản & dòng tiền -----
