@@ -30,18 +30,19 @@
 - Đa tiền tệ cho Chia tiền nhóm (TripExpense.currency, báo cáo quy đổi VND).
 - Mô phỏng trả nợ chính xác hơn: minPayment = khoản góp cố định theo GỐC & kỳ hạn ban đầu (`toDebtForSim`/`minimumMonthlyPayment`), không hạ thấp theo dư nợ còn lại.
 - Liên kết Trip ↔ Giao dịch cá nhân: đánh dấu "Tôi" (`isSelf`); ứng tiền chi phí → giao dịch chi (nhiều nguồn); tổng kết → giao dịch thu/chi + ghi nhận đã thanh toán (`TripSettlement`).
+- Nhắc nợ/mục tiêu đến hạn qua **email** (SMTP/nodemailer): `User.email` + trang Cài đặt + cron `/api/reminders/email`.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
 - Chưa có (đang chờ chọn task tiếp theo).
 
 ## Next
-- **Nhắc qua email/push** (hiện chỉ nhắc trong app).
+- **Nhắc qua push** (web/mobile push) — email đã xong, còn push.
 
 ## Later
 - **Bảo mật đăng nhập thật (Keycloak/OIDC)**: hiện chỉ nhập username không mật khẩu. Cắm IdP qua `User.externalId` (map `sub`) + đổi thân `getCurrentUserId()` trong `src/lib/currentUser.ts` — không phải sửa query. Kèm: trang quản lý user / đổi username, xoá user.
 - Map cột CSV linh hoạt khi import sao kê ngân hàng (định dạng khác nhau giữa ngân hàng).
-- Nhắc lịch trả nợ / đáo hạn (push/email).
+- Nhắc lịch trả nợ / đáo hạn qua **push** (email đã có).
 - Mở rộng danh sách mã crypto hỗ trợ / nhập `priceId` tùy chỉnh.
 
 ## Technical Debt

@@ -59,6 +59,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     <span className="px-2 text-sm text-gray-500 dark:text-gray-400" title="Đang đăng nhập">
                       @{user.username}
                     </span>
+                    <Link
+                      href="/settings"
+                      title="Cài đặt"
+                      className="rounded-lg px-2 py-1.5 text-sm text-gray-500 hover:bg-black/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white"
+                    >
+                      ⚙
+                    </Link>
                     <form action={logout}>
                       <button className="rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-black/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white">
                         Đăng xuất

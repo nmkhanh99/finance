@@ -16,6 +16,7 @@ datasource db {
 model User {
   id         String   @id @default(cuid())
   username   String   @unique
+  email      String? // để nhận nhắc nhở qua email (tuỳ chọn)
   externalId String?  @unique
   createdAt  DateTime @default(now())
 

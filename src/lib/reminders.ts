@@ -20,3 +20,50 @@ export function dueStatus(due: Date, now: Date, soonDays = 30): DueStatus {
   if (days <= soonDays) return "soon";
   return "upcoming";
 }
+
+export interface ReminderItem {
+  label: string;
+  due: Date;
+  days: number; // số ngày còn lại (âm = quá hạn)
+  status: "overdue" | "soon";
+  href: string;
+}
+
+// Chấp nhận cả Prisma.Decimal (có toString) lẫn number/string — dùng Number() để quy ra số.
+type Numeric = number | string | { toString(): string };
+
+interface DebtLike {
+  name: string;
+  principal: Numeric;
+  startDate: Date;
+  termMonths: number;
+  payments: { principal: Numeric }[];
+}
+interface GoalLike {
+  name: string;
+  currentSaved: Numeric;
+  targetAmount: Numeric;
+  targetDate: Date;
+}
+
+/**
+ * Danh sách nhắc nhở đến hạn: nợ còn dư sắp đáo hạn + mục tiêu chưa đạt sắp đến hạn
+ * (quá hạn hoặc trong `soonDays` ngày). Dùng chung cho Dashboard & email nhắc.
+ */
+export function buildReminders(debts: DebtLike[], goals: GoalLike[], now: Date, soonDays = 30): ReminderItem[] {
+  const out: ReminderItem[] = [];
+  for (const d of debts) {
+    const paid = d.payments.reduce((s, p) => s + Number(p.principal), 0);
+    if (Number(d.principal) - paid <= 0) continue; // đã trả hết
+    const due = addMonths(d.startDate, d.termMonths);
+    const st = dueStatus(due, now, soonDays);
+    if (st !== "upcoming") out.push({ label: `Nợ "${d.name}" đáo hạn`, due, days: daysBetween(now, due), status: st, href: "/debts" });
+  }
+  for (const g of goals) {
+    if (Number(g.currentSaved) >= Number(g.targetAmount)) continue; // đã đạt
+    const st = dueStatus(g.targetDate, now, soonDays);
+    if (st !== "upcoming") out.push({ label: `Mục tiêu "${g.name}"`, due: g.targetDate, days: daysBetween(now, g.targetDate), status: st, href: "/goals" });
+  }
+  out.sort((a, b) => a.due.getTime() - b.due.getTime());
+  return out;
+}

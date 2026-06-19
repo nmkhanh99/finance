@@ -18,6 +18,8 @@ cat > /etc/crontabs/root <<EOF
 30 23 * * * curl -fsS "$BASE/networth/snapshot$Q" >/dev/null 2>&1
 # Cập nhật tỷ giá — 06:00 hằng ngày
 0 6 * * * curl -fsS "$BASE/rates/refresh$Q" >/dev/null 2>&1
+# Gửi email nhắc nhở nợ/mục tiêu đến hạn — 07:00 hằng ngày
+0 7 * * * curl -fsS "$BASE/reminders/email$Q" >/dev/null 2>&1
 EOF
 
 echo "[cron] đã cài crontab:"

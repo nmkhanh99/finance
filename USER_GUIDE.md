@@ -37,6 +37,12 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 - Dữ liệu cũ (trước khi có nhiều tài khoản) nằm ở username **`default`** — đăng nhập `default` để xem.
 - **Lưu ý bảo mật:** hiện chưa có mật khẩu, nên chỉ phù hợp chạy local/tin cậy. Lớp bảo mật đăng nhập thật (Keycloak) sẽ bổ sung sau; **đừng đưa app lên mạng công khai khi chưa có mật khẩu** vì đây là dữ liệu tài chính nhạy cảm.
 
+## Cài đặt — Nhắc nhở qua email
+- Bấm **⚙ (Cài đặt)** trên thanh trên → mục **Nhắc nhở qua email**.
+- Nhập **email** của bạn rồi **Lưu**. Hệ thống sẽ gửi email tóm tắt các khoản **nợ/mục tiêu sắp đến hạn** (trong 30 ngày hoặc đã quá hạn) — tự động hằng ngày (07:00).
+- Trang Cài đặt cho biết **SMTP đã cấu hình hay chưa**. Nếu chưa, người quản trị cần đặt biến môi trường `SMTP_HOST`, `SMTP_PORT` (và `SMTP_USER`/`SMTP_PASS`/`SMTP_FROM`) — xem `.env.example`. Với Gmail: bật **App Password** và dùng làm `SMTP_PASS`.
+- Nút **Gửi thử ngay** để kiểm tra cấu hình (gửi email tới chính bạn). Để trống ô email = tắt nhắc.
+
 ## Giao dịch định kỳ
 1. Vào **Định kỳ**.
 2. Tạo mẫu: **Loại** (Thu/Chi/Chuyển), **Số tiền**, **Tần suất** (hằng ngày/tuần/tháng), **Tài khoản**, **Danh mục**, **Ngày bắt đầu**, và **Ngày kết thúc** (tuỳ chọn).

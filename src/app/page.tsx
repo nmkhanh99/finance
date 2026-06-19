@@ -5,7 +5,7 @@ import { computeNetWorth } from "@/lib/networth";
 import { evaluateBudget } from "@/lib/budget";
 import { convertToBase } from "@/lib/currency";
 import { loadRates } from "@/lib/rates";
-import { addMonths, daysBetween, dueStatus } from "@/lib/reminders";
+import { buildReminders } from "@/lib/reminders";
 import { formatMoney, formatDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -54,21 +54,7 @@ export default async function DashboardPage() {
   const { totalCash, totalInvest, totalDebt, netWorth: nw } = nwb;
 
   // Nhắc nhở: nợ còn dư sắp đáo hạn + mục tiêu chưa đạt sắp đến hạn (trong 30 ngày / quá hạn)
-  interface Reminder { label: string; due: Date; days: number; status: "overdue" | "soon"; href: string }
-  const reminders: Reminder[] = [];
-  for (const d of debts) {
-    const paid = d.payments.reduce((s, p) => s + Number(p.principal), 0);
-    if (Number(d.principal) - paid <= 0) continue; // đã trả hết
-    const due = addMonths(d.startDate, d.termMonths);
-    const st = dueStatus(due, now);
-    if (st !== "upcoming") reminders.push({ label: `Nợ "${d.name}" đáo hạn`, due, days: daysBetween(now, due), status: st, href: "/debts" });
-  }
-  for (const g of goals) {
-    if (Number(g.currentSaved) >= Number(g.targetAmount)) continue; // đã đạt
-    const st = dueStatus(g.targetDate, now);
-    if (st !== "upcoming") reminders.push({ label: `Mục tiêu "${g.name}"`, due: g.targetDate, days: daysBetween(now, g.targetDate), status: st, href: "/goals" });
-  }
-  reminders.sort((a, b) => a.due.getTime() - b.due.getTime());
+  const reminders = buildReminders(debts, goals, now);
 
   // Dòng tiền tháng + chi theo danh mục (quy đổi về VND theo tiền tệ tài khoản)
   let income = 0;
