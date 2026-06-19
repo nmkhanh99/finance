@@ -20,38 +20,38 @@ export default async function TripsPage() {
 
       <form
         action={createGroup}
-        className="flex flex-wrap items-end gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+        className="flex flex-wrap items-end gap-3 rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4"
       >
         <label className="flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Tên nhóm / chuyến đi</span>
-          <input name="name" required placeholder="VD: Đà Lạt 6/2026" className="w-64 rounded-lg border border-white/10 bg-black/30 px-3 py-2" />
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Tên nhóm / chuyến đi</span>
+          <input name="name" required placeholder="VD: Đà Lạt 6/2026" className="w-64 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
         <label className="flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Ghi chú (tuỳ chọn)</span>
-          <input name="note" className="w-64 rounded-lg border border-white/10 bg-black/30 px-3 py-2" />
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Ghi chú (tuỳ chọn)</span>
+          <input name="note" className="w-64 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
         <button className="rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black hover:bg-emerald-400">+ Tạo nhóm</button>
       </form>
 
       <div className="space-y-2">
-        {groups.length === 0 && <p className="text-gray-400">Chưa có nhóm nào.</p>}
+        {groups.length === 0 && <p className="text-gray-500 dark:text-gray-400">Chưa có nhóm nào.</p>}
         {groups.map((g) => {
           const total = g.expenses.reduce((s, e) => s + Number(e.amount), 0);
           return (
             <Link
               key={g.id}
               href={`/trips/${g.id}`}
-              className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 hover:bg-white/10"
+              className="flex items-center justify-between rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 px-4 py-3 hover:bg-black/5 dark:hover:bg-white/10"
             >
               <div>
                 <div className="font-medium">{g.name}</div>
-                <div className="text-xs text-gray-400">
+                <div className="text-xs text-gray-500 dark:text-gray-400">
                   {g.members.length} thành viên · {g.expenses.length} chi phí
                   {g.note ? ` · ${g.note}` : ""}
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-gray-400">Tổng chi</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Tổng chi</div>
                 <div className="font-semibold text-amber-400">{formatMoney(total)}</div>
               </div>
             </Link>

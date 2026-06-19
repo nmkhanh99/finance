@@ -53,19 +53,19 @@ export default async function BudgetsPage() {
           </span>
         )}
       </div>
-      <p className="text-sm text-gray-400">
+      <p className="text-sm text-gray-500 dark:text-gray-400">
         Đặt hạn mức chi mỗi tháng cho từng danh mục. Để trống / 0 để bỏ ngân sách.
       </p>
 
       {categories.length === 0 ? (
-        <p className="text-gray-400">
+        <p className="text-gray-500 dark:text-gray-400">
           Chưa có danh mục chi. Vào <a href="/categories" className="text-emerald-400 underline">Danh mục</a> để thêm.
         </p>
       ) : (
         <div className="space-y-3">
           {rows.map(({ c, limit, spent, ev, hasBudget }) => {
             const barColor = !hasBudget
-              ? "bg-white/20"
+              ? "bg-black/10 dark:bg-white/20"
               : ev.isOver
                 ? "bg-red-400"
                 : ev.percent >= 80
@@ -73,12 +73,12 @@ export default async function BudgetsPage() {
                   : "bg-emerald-400";
             const width = hasBudget && limit > 0 ? Math.min(ev.percent, 100) : 0;
             return (
-              <div key={c.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div key={c.id} className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="font-medium">{c.name}</div>
                   <form action={setBudget} className="flex items-center gap-2">
                     <input type="hidden" name="categoryId" value={c.id} />
-                    <span className="text-xs text-gray-400">Hạn mức/tháng</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Hạn mức/tháng</span>
                     <input
                       name="limitAmount"
                       type="number"
@@ -86,29 +86,29 @@ export default async function BudgetsPage() {
                       min="0"
                       defaultValue={hasBudget ? limit : ""}
                       placeholder="0"
-                      className="w-36 rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-right text-sm"
+                      className="w-36 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-1.5 text-right text-sm"
                     />
-                    <button className="rounded-lg border border-white/15 px-3 py-1.5 text-xs hover:bg-white/10">Lưu</button>
+                    <button className="rounded-lg border border-black/15 dark:border-white/15 px-3 py-1.5 text-xs hover:bg-black/5 dark:hover:bg-white/10">Lưu</button>
                   </form>
                 </div>
 
                 {hasBudget && (
                   <div className="mt-3">
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-black/5 dark:bg-white/10">
                       <div className={`h-full ${barColor}`} style={{ width: `${width}%` }} />
                     </div>
                     <div className="mt-1 flex justify-between text-xs">
-                      <span className="text-gray-400">
+                      <span className="text-gray-500 dark:text-gray-400">
                         Đã chi {formatMoney(spent)} / {formatMoney(limit)} ({ev.percent}%)
                       </span>
-                      <span className={ev.isOver ? "text-red-400" : "text-gray-400"}>
+                      <span className={ev.isOver ? "text-red-400" : "text-gray-500 dark:text-gray-400"}>
                         {ev.isOver ? `Vượt ${formatMoney(-ev.remaining)}` : `Còn ${formatMoney(ev.remaining)}`}
                       </span>
                     </div>
                   </div>
                 )}
                 {!hasBudget && spent > 0 && (
-                  <div className="mt-2 text-xs text-gray-500">Đã chi {formatMoney(spent)} tháng này (chưa đặt hạn mức)</div>
+                  <div className="mt-2 text-xs text-gray-600 dark:text-gray-500">Đã chi {formatMoney(spent)} tháng này (chưa đặt hạn mức)</div>
                 )}
               </div>
             );

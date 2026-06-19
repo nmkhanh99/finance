@@ -17,9 +17,9 @@ const TYPE_META: Record<string, { label: string; sign: string; color: string }> 
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-      <div className="text-sm text-gray-400">{label}</div>
-      <div className={`mt-1 text-2xl font-semibold ${accent ?? "text-white"}`}>{value}</div>
+    <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-5">
+      <div className="text-sm text-gray-500 dark:text-gray-400">{label}</div>
+      <div className={`mt-1 text-2xl font-semibold ${accent ?? "text-gray-900 dark:text-white"}`}>{value}</div>
     </div>
   );
 }
@@ -91,7 +91,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-lg text-gray-400">Tài sản ròng (Net Worth)</h1>
+        <h1 className="text-lg text-gray-500 dark:text-gray-400">Tài sản ròng (Net Worth)</h1>
         <div className={`mt-1 text-4xl font-bold ${nw >= 0 ? "text-emerald-400" : "text-red-400"}`}>
           {formatMoney(nw)}
         </div>
@@ -105,7 +105,7 @@ export default async function DashboardPage() {
 
       {/* Dòng tiền tháng */}
       <div>
-        <h2 className="mb-3 text-sm text-gray-400">Dòng tiền tháng {monthName}</h2>
+        <h2 className="mb-3 text-sm text-gray-500 dark:text-gray-400">Dòng tiền tháng {monthName}</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Stat label="Thu" value={formatMoney(income)} accent="text-emerald-400" />
           <Stat label="Chi" value={formatMoney(expense)} accent="text-red-400" />
@@ -130,12 +130,12 @@ export default async function DashboardPage() {
       {/* Nhắc nhở đến hạn */}
       {reminders.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-sm text-gray-400">⏰ Nhắc nhở</h2>
+          <h2 className="text-sm text-gray-500 dark:text-gray-400">⏰ Nhắc nhở</h2>
           {reminders.map((r, i) => (
             <Link
               key={i}
               href={r.href}
-              className={`flex items-center justify-between rounded-xl border px-4 py-2.5 text-sm hover:bg-white/5 ${
+              className={`flex items-center justify-between rounded-xl border px-4 py-2.5 text-sm hover:bg-black/[0.03] dark:hover:bg-white/5 ${
                 r.status === "overdue"
                   ? "border-red-500/40 bg-red-500/10 text-red-300"
                   : "border-amber-500/40 bg-amber-500/10 text-amber-200"
@@ -155,7 +155,7 @@ export default async function DashboardPage() {
       {recent.length > 0 && (
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm text-gray-400">Giao dịch gần đây</h2>
+            <h2 className="text-sm text-gray-500 dark:text-gray-400">Giao dịch gần đây</h2>
             <Link href="/transactions" className="text-xs text-emerald-400 hover:underline">
               Tất cả →
             </Link>
@@ -166,7 +166,7 @@ export default async function DashboardPage() {
               return (
                 <div
                   key={t.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 px-4 py-2.5"
                 >
                   <div className="min-w-0">
                     <div className="truncate text-sm">
@@ -174,7 +174,7 @@ export default async function DashboardPage() {
                       {t.category ? ` · ${t.category.name}` : ""}
                       {t.note ? ` · ${t.note}` : ""}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-600 dark:text-gray-500">
                       {formatDate(t.date)} · {t.account.name}
                       {t.toAccount ? ` → ${t.toAccount.name}` : ""}
                     </div>
@@ -191,7 +191,7 @@ export default async function DashboardPage() {
       )}
 
       {accountCount === 0 && (
-        <p className="rounded-xl border border-dashed border-white/15 p-6 text-center text-gray-400">
+        <p className="rounded-xl border border-dashed border-black/15 dark:border-white/15 p-6 text-center text-gray-500 dark:text-gray-400">
           Chưa có tài khoản nào. Vào{" "}
           <a href="/accounts" className="text-emerald-400 underline">
             Tài khoản

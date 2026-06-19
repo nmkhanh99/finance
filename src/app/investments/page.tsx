@@ -63,7 +63,7 @@ export default async function InvestmentsPage({
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h1 className="text-2xl font-semibold">Đầu tư</h1>
         <div className="flex items-center gap-4">
-          <div className="text-right text-sm text-gray-400">
+          <div className="text-right text-sm text-gray-500 dark:text-gray-400">
             Giá trị TT (VND):{" "}
             <span className="font-semibold text-amber-400">{formatMoney(totalMarket)}</span>
             <span className="mx-2">·</span>
@@ -102,66 +102,66 @@ export default async function InvestmentsPage({
       {/* Form thêm holding */}
       <form
         action={createHolding}
-        className="grid grid-cols-2 gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:grid-cols-6"
+        className="grid grid-cols-2 gap-3 rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4 sm:grid-cols-6"
       >
         <label className="flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Mã</span>
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Mã</span>
           <input
             name="symbol"
             required
             placeholder="VNM / BTC"
-            className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 uppercase"
+            className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2 uppercase"
           />
         </label>
         <label className="flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Loại</span>
-          <select name="assetType" className="rounded-lg border border-white/10 bg-black/30 px-3 py-2">
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Loại</span>
+          <select name="assetType" className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2">
             <option value="STOCK">Chứng khoán</option>
             <option value="CRYPTO">Tiền ảo</option>
           </select>
         </label>
         <label className="flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Số lượng</span>
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Số lượng</span>
           <input
             name="quantity"
             type="number"
             step="any"
             min="0"
             required
-            className="rounded-lg border border-white/10 bg-black/30 px-3 py-2"
+            className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2"
           />
         </label>
         <label className="flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Giá vốn / đơn vị</span>
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Giá vốn / đơn vị</span>
           <input
             name="avgCost"
             type="number"
             step="any"
             min="0"
             required
-            className="rounded-lg border border-white/10 bg-black/30 px-3 py-2"
+            className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2"
           />
         </label>
         <label className="flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Tiền tệ</span>
-          <input name="currency" defaultValue="VND" maxLength={5} className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 uppercase" />
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Tiền tệ</span>
+          <input name="currency" defaultValue="VND" maxLength={5} className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2 uppercase" />
         </label>
         <button className="self-end rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black hover:bg-emerald-400">
           + Thêm / Mua thêm
         </button>
       </form>
-      <p className="-mt-5 text-xs text-gray-500">
+      <p className="-mt-5 text-xs text-gray-600 dark:text-gray-500">
         Thêm cùng mã + loại đã có sẽ tự gộp và tính lại giá vốn trung bình.
       </p>
 
       {/* Bảng holdings */}
       <div className="overflow-x-auto">
         {rows.length === 0 ? (
-          <p className="text-gray-400">Chưa có khoản đầu tư nào.</p>
+          <p className="text-gray-500 dark:text-gray-400">Chưa có khoản đầu tư nào.</p>
         ) : (
           <table className="w-full text-sm">
-            <thead className="text-left text-gray-400">
-              <tr className="border-b border-white/10">
+            <thead className="text-left text-gray-500 dark:text-gray-400">
+              <tr className="border-b border-black/10 dark:border-white/10">
                 <th className="py-2 pr-3">Mã</th>
                 <th className="py-2 pr-3">SL</th>
                 <th className="py-2 pr-3">Giá vốn</th>
@@ -173,10 +173,10 @@ export default async function InvestmentsPage({
             </thead>
             <tbody>
               {rows.map(({ h, qty, avgCost, currentPrice, hasPrice, priceAt, pnl }) => (
-                <tr key={h.id} className="border-b border-white/5">
+                <tr key={h.id} className="border-b border-black/5 dark:border-white/5">
                   <td className="py-3 pr-3">
                     <div className="font-medium">{h.symbol}</div>
-                    <div className="text-xs text-gray-500">{ASSET_LABEL[h.assetType]}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-500">{ASSET_LABEL[h.assetType]}</div>
                   </td>
                   <td className="py-3 pr-3">{qty}</td>
                   <td className="py-3 pr-3">{formatMoney(avgCost, h.currency)}</td>
@@ -189,18 +189,18 @@ export default async function InvestmentsPage({
                         step="any"
                         min="0"
                         defaultValue={currentPrice}
-                        className="w-28 rounded-lg border border-white/10 bg-black/30 px-2 py-1 text-right"
+                        className="w-28 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-2 py-1 text-right"
                       />
                       <button
                         title="Cập nhật giá"
-                        className="rounded-lg border border-white/15 px-2 py-1 text-xs hover:bg-white/10"
+                        className="rounded-lg border border-black/15 dark:border-white/15 px-2 py-1 text-xs hover:bg-black/5 dark:hover:bg-white/10"
                       >
                         ↻
                       </button>
-                      {!hasPrice && <span className="text-xs text-gray-500">(= giá vốn)</span>}
+                      {!hasPrice && <span className="text-xs text-gray-600 dark:text-gray-500">(= giá vốn)</span>}
                     </form>
                     {priceAt && (
-                      <div className="mt-0.5 text-[10px] text-gray-500">{formatTime(priceAt)}</div>
+                      <div className="mt-0.5 text-[10px] text-gray-600 dark:text-gray-500">{formatTime(priceAt)}</div>
                     )}
                   </td>
                   <td className="py-3 pr-3 text-right">{formatMoney(pnl.marketValue, h.currency)}</td>
@@ -235,14 +235,14 @@ export default async function InvestmentsPage({
       {selected && (
         <section className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-medium text-gray-300">Lịch sử giá</h2>
+            <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300">Lịch sử giá</h2>
             <div className="flex flex-wrap gap-1">
               {holdings.map((h) => (
                 <Link
                   key={h.id}
                   href={`/investments?symbol=${h.symbol}`}
                   className={`rounded-lg px-2.5 py-1 text-xs ${
-                    h.id === selected.id ? "bg-amber-400 text-black" : "border border-white/15 hover:bg-white/10"
+                    h.id === selected.id ? "bg-amber-400 text-black" : "border border-black/15 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10"
                   }`}
                 >
                   {h.symbol}
@@ -253,7 +253,7 @@ export default async function InvestmentsPage({
           {pricePoints.length >= 2 ? (
             <PriceChart data={pricePoints} symbol={selected.symbol} />
           ) : (
-            <p className="rounded-xl border border-dashed border-white/15 p-5 text-center text-sm text-gray-400">
+            <p className="rounded-xl border border-dashed border-black/15 dark:border-white/15 p-5 text-center text-sm text-gray-500 dark:text-gray-400">
               {selected.symbol}: chưa đủ dữ liệu giá. Bấm "↻ Cập nhật giá" hoặc nhập giá thủ công nhiều lần để vẽ biểu đồ.
             </p>
           )}

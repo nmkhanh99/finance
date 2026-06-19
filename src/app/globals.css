@@ -1,8 +1,30 @@
 @import "tailwindcss";
 
+/* Bật dark mode theo class .dark trên <html> (thay vì chỉ prefers-color-scheme),
+   để hỗ trợ chọn thủ công sáng/tối/theo hệ thống. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Theme sáng (mặc định) */
 :root {
+  --background: #f7f8fa;
+  --foreground: #1a1f2e;
+  /* Token cho biểu đồ (Recharts đọc qua var trong SVG) */
+  --chart-grid: rgba(0, 0, 0, 0.08);
+  --chart-muted: #6b7280;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: rgba(0, 0, 0, 0.15);
+  --chart-tooltip-fg: #1a1f2e;
+}
+
+/* Theme tối */
+.dark {
   --background: #0b0f1a;
   --foreground: #e6e9ef;
+  --chart-grid: rgba(255, 255, 255, 0.08);
+  --chart-muted: #9ca3af;
+  --chart-tooltip-bg: #0b0f1a;
+  --chart-tooltip-border: rgba(255, 255, 255, 0.15);
+  --chart-tooltip-fg: #e6e9ef;
 }
 
 body {

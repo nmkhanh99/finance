@@ -25,6 +25,7 @@
 - Sửa & tạm dừng/tiếp tục giao dịch định kỳ trong UI.
 - Đa tiền tệ (VND base + tỷ giá); Net Worth + dòng tiền + ngân sách quy đổi.
 - Tự cập nhật tỷ giá từ API (open.er-api.com) + cron.
+- Giao diện Sáng / Tối / Theo hệ thống (ThemeToggle + class `.dark`, chống nhấp nháy, charts theo CSS var).
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress

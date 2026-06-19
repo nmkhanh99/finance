@@ -51,9 +51,9 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
     <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <Link href="/trips" className="text-sm text-gray-400 hover:text-white">← Tất cả nhóm</Link>
+          <Link href="/trips" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">← Tất cả nhóm</Link>
           <h1 className="text-2xl font-semibold">{group.name}</h1>
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             Tổng chi: <span className="font-semibold text-amber-400">{formatMoney(total)}</span>
             {group.members.length > 0 ? ` · ${group.members.length} thành viên` : ""}
           </div>
@@ -66,10 +66,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
 
       {/* Thành viên */}
       <section className="space-y-3">
-        <h2 className="text-lg font-medium text-gray-300">Thành viên</h2>
+        <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300">Thành viên</h2>
         <div className="flex flex-wrap gap-2">
           {group.members.map((m) => (
-            <span key={m.id} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
+            <span key={m.id} className="flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 px-3 py-1 text-sm">
               {m.name}
               <form action={deleteMember}>
                 <input type="hidden" name="id" value={m.id} />
@@ -81,31 +81,31 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
         </div>
         <form action={addMember} className="flex items-end gap-2">
           <input type="hidden" name="groupId" value={group.id} />
-          <input name="name" required placeholder="Tên thành viên" className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm" />
-          <button className="rounded-lg border border-white/15 px-3 py-2 text-sm hover:bg-white/10">+ Thêm</button>
+          <input name="name" required placeholder="Tên thành viên" className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2 text-sm" />
+          <button className="rounded-lg border border-black/15 dark:border-white/15 px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/10">+ Thêm</button>
         </form>
       </section>
 
       {/* Thêm chi phí */}
       {group.members.length >= 1 ? (
         <section className="space-y-3">
-          <h2 className="text-lg font-medium text-gray-300">Thêm chi phí</h2>
+          <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300">Thêm chi phí</h2>
           <ExpenseForm groupId={group.id} members={group.members} />
         </section>
       ) : (
-        <p className="text-sm text-gray-400">Thêm ít nhất 1 thành viên để bắt đầu ghi chi phí.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Thêm ít nhất 1 thành viên để bắt đầu ghi chi phí.</p>
       )}
 
       {/* Danh sách chi phí */}
       {group.expenses.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-lg font-medium text-gray-300">Các khoản chi ({group.expenses.length})</h2>
+          <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300">Các khoản chi ({group.expenses.length})</h2>
           {group.expenses.map((e) => (
-            <div key={e.id} className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+            <div key={e.id} className="rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="font-medium">{e.description}</div>
-                  <div className="text-xs text-gray-400">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     {formatDate(e.date)} · <span className="text-sky-400">{e.payer.name}</span> trả ·
                     chia cho {e.shares.map((s) => s.member.name).join(", ")}
                     {e.splitType === "CUSTOM" ? " (tùy chỉnh)" : ""}
@@ -128,11 +128,11 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       {/* Báo cáo phân tích */}
       {group.expenses.length > 0 && (
         <section className="space-y-4">
-          <h2 className="text-lg font-medium text-gray-300">Báo cáo phân tích</h2>
-          <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
+          <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300">Báo cáo phân tích</h2>
+          <div className="overflow-x-auto rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5">
             <table className="w-full text-sm">
-              <thead className="text-left text-gray-400">
-                <tr className="border-b border-white/10">
+              <thead className="text-left text-gray-500 dark:text-gray-400">
+                <tr className="border-b border-black/10 dark:border-white/10">
                   <th className="px-4 py-2">Thành viên</th>
                   <th className="px-4 py-2 text-right">Đã trả</th>
                   <th className="px-4 py-2 text-right">Phải chịu</th>
@@ -141,7 +141,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
               </thead>
               <tbody>
                 {balances.map((b) => (
-                  <tr key={b.id} className="border-b border-white/5">
+                  <tr key={b.id} className="border-b border-black/5 dark:border-white/5">
                     <td className="px-4 py-2">{b.name}</td>
                     <td className="px-4 py-2 text-right">{formatMoney(b.paid)}</td>
                     <td className="px-4 py-2 text-right">{formatMoney(b.owed)}</td>
@@ -154,20 +154,20 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-gray-500">Chênh lệch dương: nhóm nợ bạn. Âm: bạn cần trả lại nhóm.</p>
+          <p className="text-xs text-gray-600 dark:text-gray-500">Chênh lệch dương: nhóm nợ bạn. Âm: bạn cần trả lại nhóm.</p>
 
           {/* Phương án thanh toán */}
           <div className="space-y-2">
-            <h3 className="font-medium text-gray-300">Phương án thanh toán (tối thiểu)</h3>
+            <h3 className="font-medium text-gray-700 dark:text-gray-300">Phương án thanh toán (tối thiểu)</h3>
             {transfers.length === 0 ? (
               <p className="text-sm text-emerald-400">✓ Đã cân bằng, không ai cần chuyển tiền.</p>
             ) : (
               transfers.map((t, i) => (
-                <div key={i} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm">
+                <div key={i} className="flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 px-4 py-2 text-sm">
                   <span className="font-medium text-red-400">{t.fromName}</span>
-                  <span className="text-gray-400">chuyển</span>
+                  <span className="text-gray-500 dark:text-gray-400">chuyển</span>
                   <span className="font-semibold">{formatMoney(t.amount)}</span>
-                  <span className="text-gray-400">cho</span>
+                  <span className="text-gray-500 dark:text-gray-400">cho</span>
                   <span className="font-medium text-emerald-400">{t.toName}</span>
                 </div>
               ))

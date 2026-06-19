@@ -5,6 +5,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 ## 2026-06-19
 
 ### Added
+- **Giao diện Sáng / Tối / Theo hệ thống**: nút ☀️/🌙/🖥️ trên thanh nav (cycle), lưu lựa chọn vào `localStorage`; mặc định theo hệ điều hành và tự đổi khi đổi chế độ hệ thống. Dark bật bằng class `.dark` trên `<html>` (Tailwind `@custom-variant dark`), script inline chống nhấp nháy khi tải. `src/app/ThemeToggle.tsx`; biến màu light/dark + token chart trong `globals.css`; charts đọc màu qua CSS var. Toàn bộ 21 file UI chuyển class dark-only → cặp light + `dark:`.
 - **Tự cập nhật tỷ giá từ API** (open.er-api.com): nút trên trang Tỷ giá + endpoint cron `/api/rates/refresh`; `src/lib/fxRates.ts`.
 - **Đa tiền tệ**: model `ExchangeRate` + trang **Tỷ giá** (base VND); chọn tiền tệ khi tạo Tài khoản/Đầu tư; Net Worth & tổng tài khoản/đầu tư quy đổi về VND. `src/lib/currency.ts` (`convertToBase`, +3 test).
 - **Nhắc nhở đến hạn** trên Dashboard: khoản nợ còn dư sắp đáo hạn (startDate+kỳ hạn) và mục tiêu chưa đạt sắp đến hạn — trong 30 ngày (vàng) hoặc quá hạn (đỏ); `src/lib/reminders.ts` +3 test.

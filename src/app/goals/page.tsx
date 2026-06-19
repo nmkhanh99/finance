@@ -24,30 +24,30 @@ export default async function GoalsPage() {
       {/* Form thêm mục tiêu */}
       <form
         action={createGoal}
-        className="grid grid-cols-2 gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:grid-cols-4"
+        className="grid grid-cols-2 gap-3 rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4 sm:grid-cols-4"
       >
         <label className="col-span-2 flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Tên mục tiêu</span>
-          <input name="name" required placeholder="VD: Mua nhà" className="rounded-lg border border-white/10 bg-black/30 px-3 py-2" />
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Tên mục tiêu</span>
+          <input name="name" required placeholder="VD: Mua nhà" className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
         <label className="flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Số tiền cần (VND)</span>
-          <input name="targetAmount" type="number" step="1000" min="0" required className="rounded-lg border border-white/10 bg-black/30 px-3 py-2" />
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Số tiền cần (VND)</span>
+          <input name="targetAmount" type="number" step="1000" min="0" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
         <label className="flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Đã có (VND)</span>
-          <input name="currentSaved" type="number" step="1000" min="0" defaultValue={0} className="rounded-lg border border-white/10 bg-black/30 px-3 py-2" />
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Đã có (VND)</span>
+          <input name="currentSaved" type="number" step="1000" min="0" defaultValue={0} className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
         <label className="flex flex-col text-sm">
-          <span className="mb-1 text-gray-400">Hạn đạt được</span>
-          <input name="targetDate" type="date" required className="rounded-lg border border-white/10 bg-black/30 px-3 py-2" />
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Hạn đạt được</span>
+          <input name="targetDate" type="date" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
         <button className="self-end rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black hover:bg-emerald-400">+ Thêm</button>
       </form>
 
       {/* Danh sách mục tiêu */}
       <div className="space-y-4">
-        {goals.length === 0 && <p className="text-gray-400">Chưa có mục tiêu nào.</p>}
+        {goals.length === 0 && <p className="text-gray-500 dark:text-gray-400">Chưa có mục tiêu nào.</p>}
         {goals.map((g) => {
           const target = Number(g.targetAmount);
           const saved = Number(g.currentSaved);
@@ -57,11 +57,11 @@ export default async function GoalsPage() {
           const done = saved >= target;
 
           return (
-            <div key={g.id} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div key={g.id} className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <div className="text-lg font-medium">{g.name}</div>
-                  <div className="text-xs text-gray-400">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     {formatMoney(saved)} / {formatMoney(target)} · hạn {formatDate(g.targetDate)}
                     {months > 0 ? ` · còn ${months} tháng` : " · đã đến/quá hạn"}
                   </div>
@@ -73,16 +73,16 @@ export default async function GoalsPage() {
               </div>
 
               {/* Thanh tiến độ */}
-              <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-white/10">
+              <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-black/5 dark:bg-white/10">
                 <div
                   className={`h-full ${done ? "bg-emerald-400" : "bg-sky-400"}`}
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <div className="mt-1 text-xs text-gray-400">{progress.toFixed(1)}%</div>
+              <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{progress.toFixed(1)}%</div>
 
               {/* Gợi ý tiết kiệm */}
-              <div className="mt-4 border-t border-white/10 pt-3 text-sm">
+              <div className="mt-4 border-t border-black/10 dark:border-white/10 pt-3 text-sm">
                 {done ? (
                   <span className="font-medium text-emerald-400">🎉 Đã đạt mục tiêu!</span>
                 ) : months === 0 ? (
@@ -90,7 +90,7 @@ export default async function GoalsPage() {
                     Còn thiếu <span className="font-semibold">{formatMoney(target - saved)}</span> và đã đến hạn.
                   </span>
                 ) : (
-                  <span className="text-gray-300">
+                  <span className="text-gray-700 dark:text-gray-300">
                     Cần tiết kiệm{" "}
                     <span className="font-semibold text-emerald-400">{formatMoney(perMonth)}/tháng</span>{" "}
                     trong {months} tháng để đạt mục tiêu.
@@ -102,10 +102,10 @@ export default async function GoalsPage() {
               <form action={updateSaved} className="mt-3 flex items-end gap-2">
                 <input type="hidden" name="id" value={g.id} />
                 <label className="flex flex-col text-xs">
-                  <span className="mb-1 text-gray-400">Cập nhật số đã có</span>
-                  <input name="currentSaved" type="number" step="1000" min="0" defaultValue={saved} className="w-44 rounded-lg border border-white/10 bg-black/30 px-3 py-1.5" />
+                  <span className="mb-1 text-gray-500 dark:text-gray-400">Cập nhật số đã có</span>
+                  <input name="currentSaved" type="number" step="1000" min="0" defaultValue={saved} className="w-44 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-1.5" />
                 </label>
-                <button className="rounded-lg border border-white/15 px-3 py-1.5 text-sm hover:bg-white/10">Lưu</button>
+                <button className="rounded-lg border border-black/15 dark:border-white/15 px-3 py-1.5 text-sm hover:bg-black/5 dark:hover:bg-white/10">Lưu</button>
               </form>
             </div>
           );

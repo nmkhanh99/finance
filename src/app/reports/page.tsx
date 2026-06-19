@@ -110,7 +110,7 @@ export default async function ReportsPage({
       {/* Net Worth theo thời gian */}
       <section className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-medium text-gray-300">Net Worth theo thời gian</h2>
+          <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300">Net Worth theo thời gian</h2>
           <form action={snapshotNetWorth}>
             <button className="rounded-lg border border-emerald-500/40 px-3 py-1.5 text-sm text-emerald-400 hover:bg-emerald-500/10">
               📌 Ghi lại Net Worth hôm nay
@@ -120,7 +120,7 @@ export default async function ReportsPage({
         {nwSeries.length >= 2 ? (
           <NetWorthChart data={nwSeries} />
         ) : (
-          <p className="rounded-xl border border-dashed border-white/15 p-5 text-center text-sm text-gray-400">
+          <p className="rounded-xl border border-dashed border-black/15 dark:border-white/15 p-5 text-center text-sm text-gray-500 dark:text-gray-400">
             {nwSeries.length === 0
               ? "Chưa có dữ liệu. Bấm \"Ghi lại Net Worth hôm nay\" để bắt đầu theo dõi (mỗi ngày 1 điểm)."
               : "Đã có 1 điểm. Ghi thêm vào những ngày sau để vẽ đường biến động."}
@@ -130,24 +130,24 @@ export default async function ReportsPage({
 
       {/* Biểu đồ dòng tiền 6 tháng */}
       <section className="space-y-3">
-        <h2 className="text-lg font-medium text-gray-300">Dòng tiền 6 tháng gần nhất</h2>
+        <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300">Dòng tiền 6 tháng gần nhất</h2>
         <CashFlowChart data={months} />
       </section>
 
       {/* Dòng tiền tháng */}
       <section className="space-y-4">
-        <h2 className="text-lg font-medium text-gray-300">Dòng tiền tháng {monthName}</h2>
+        <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300">Dòng tiền tháng {monthName}</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <div className="text-sm text-gray-400">Thu</div>
+          <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-5">
+            <div className="text-sm text-gray-500 dark:text-gray-400">Thu</div>
             <div className="mt-1 text-2xl font-semibold text-emerald-400">{formatMoney(income)}</div>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <div className="text-sm text-gray-400">Chi</div>
+          <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-5">
+            <div className="text-sm text-gray-500 dark:text-gray-400">Chi</div>
             <div className="mt-1 text-2xl font-semibold text-red-400">{formatMoney(expense)}</div>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <div className="text-sm text-gray-400">Còn lại (tiết kiệm)</div>
+          <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-5">
+            <div className="text-sm text-gray-500 dark:text-gray-400">Còn lại (tiết kiệm)</div>
             <div className={`mt-1 text-2xl font-semibold ${net >= 0 ? "text-sky-400" : "text-red-400"}`}>
               {formatMoney(net)}
             </div>
@@ -156,51 +156,51 @@ export default async function ReportsPage({
 
         {/* Chi theo danh mục */}
         {catRows.length > 0 ? (
-          <div className="space-y-2 rounded-2xl border border-white/10 bg-white/5 p-5">
-            <div className="mb-2 text-sm text-gray-400">Chi theo danh mục</div>
+          <div className="space-y-2 rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-5">
+            <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">Chi theo danh mục</div>
             {catRows.map(([name, amt]) => (
               <div key={name} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span>{name}</span>
-                  <span className="text-gray-300">
+                  <span className="text-gray-700 dark:text-gray-300">
                     {formatMoney(amt)} · {expense > 0 ? ((amt / expense) * 100).toFixed(0) : 0}%
                   </span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/5 dark:bg-white/10">
                   <div className="h-full bg-amber-400" style={{ width: `${maxCat > 0 ? (amt / maxCat) * 100 : 0}%` }} />
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-400">Chưa có khoản chi nào trong tháng này.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Chưa có khoản chi nào trong tháng này.</p>
         )}
       </section>
 
       {/* Chiến lược trả nợ */}
       <section className="space-y-4">
-        <h2 className="text-lg font-medium text-gray-300">Chiến lược trả nợ: Avalanche vs Snowball</h2>
+        <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300">Chiến lược trả nợ: Avalanche vs Snowball</h2>
 
         {simDebts.length === 0 ? (
-          <p className="text-sm text-gray-400">Không có khoản nợ nào để mô phỏng.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Không có khoản nợ nào để mô phỏng.</p>
         ) : (
           <>
-            <form method="get" className="flex flex-wrap items-end gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+            <form method="get" className="flex flex-wrap items-end gap-3 rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4">
               <label className="flex flex-col text-sm">
-                <span className="mb-1 text-gray-400">Số tiền trả thêm mỗi tháng (ngoài mức tối thiểu)</span>
+                <span className="mb-1 text-gray-500 dark:text-gray-400">Số tiền trả thêm mỗi tháng (ngoài mức tối thiểu)</span>
                 <input
                   name="extra"
                   type="number"
                   step="100000"
                   min="0"
                   defaultValue={extra}
-                  className="w-56 rounded-lg border border-white/10 bg-black/30 px-3 py-2"
+                  className="w-56 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2"
                 />
               </label>
               <button className="rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black hover:bg-emerald-400">
                 Tính lại
               </button>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-600 dark:text-gray-500">
                 Mức trả tối thiểu/tháng được ước tính theo gốc & kỳ hạn từng khoản.
               </span>
             </form>
@@ -215,22 +215,22 @@ export default async function ReportsPage({
                   className={`rounded-2xl border p-5 ${
                     c.key === "avalanche" && interestSaved > 0
                       ? "border-emerald-500/40 bg-emerald-500/5"
-                      : "border-white/10 bg-white/5"
+                      : "border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5"
                   }`}
                 >
                   <div className="font-medium">{c.title}</div>
-                  <div className="mt-0.5 text-xs text-gray-400">{c.desc}</div>
+                  <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{c.desc}</div>
                   <div className="mt-4 space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Thời gian trả hết</span>
+                      <span className="text-gray-500 dark:text-gray-400">Thời gian trả hết</span>
                       <span className="font-semibold">{c.r ? monthsLabel(c.r.months) : "—"}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Tổng lãi phải trả</span>
+                      <span className="text-gray-500 dark:text-gray-400">Tổng lãi phải trả</span>
                       <span className="font-semibold text-amber-400">{c.r ? formatMoney(c.r.totalInterest) : "—"}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Tổng tiền trả</span>
+                      <span className="text-gray-500 dark:text-gray-400">Tổng tiền trả</span>
                       <span className="font-semibold">{c.r ? formatMoney(c.r.totalPaid) : "—"}</span>
                     </div>
                   </div>

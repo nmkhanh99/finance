@@ -26,16 +26,16 @@ const fmtShort = (n: number) => {
 
 export default function CashFlowChart({ data }: { data: MonthPoint[] }) {
   return (
-    <div className="h-72 w-full rounded-2xl border border-white/10 bg-white/5 p-4">
+    <div className="h-72 w-full rounded-2xl border border-black/10 bg-black/[0.03] p-4 dark:border-white/10 dark:bg-white/5">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-          <XAxis dataKey="month" tick={{ fill: "#9ca3af", fontSize: 12 }} />
-          <YAxis tickFormatter={fmtShort} tick={{ fill: "#9ca3af", fontSize: 12 }} width={44} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+          <XAxis dataKey="month" tick={{ fill: "var(--chart-muted)", fontSize: 12 }} />
+          <YAxis tickFormatter={fmtShort} tick={{ fill: "var(--chart-muted)", fontSize: 12 }} width={44} />
           <Tooltip
             formatter={(v) => `${fmt(Number(v))} ₫`}
-            contentStyle={{ background: "#0b0f1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12 }}
-            labelStyle={{ color: "#e6e9ef" }}
+            contentStyle={{ background: "var(--chart-tooltip-bg)", border: "1px solid var(--chart-tooltip-border)", borderRadius: 12 }}
+            labelStyle={{ color: "var(--chart-tooltip-fg)" }}
           />
           <Legend wrapperStyle={{ fontSize: 12 }} />
           <Bar dataKey="thu" name="Thu" fill="#34d399" radius={[4, 4, 0, 0]} />
