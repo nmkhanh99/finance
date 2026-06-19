@@ -35,6 +35,7 @@
 - Lint (ESLint flat config `next/core-web-vitals` + TS) chạy sạch; hạ tầng test UI (vitest + jsdom + Testing Library) + test mẫu ThemeToggle.
 - Ngày-chỉ chuyển sang `@db.Date` (UTC-midnight): hết lệch +7h. Helper `dateOnly.ts`, mọi chỗ ghi/lọc/nhóm/hiển thị dùng UTC nhất quán.
 - Import sao kê ngân hàng map cột linh hoạt (`importBank.ts`): chọn tài khoản + map Ngày/Số tiền (1 cột hoặc Nợ-Có)/Nội dung; parser số & ngày đa định dạng.
+- **Verify Docker end-to-end thật**: `docker compose up --build` — Postgres healthy, migrate chạy đủ 14 migration + seed (cả DB cũ lẫn fresh volume), web phục vụ & query Postgres OK, cron up.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
@@ -49,4 +50,3 @@
 
 ## Technical Debt
 - **Đăng nhập chưa có mật khẩu** (chỉ username) — cần cắm Keycloak/OIDC + trang quản lý user (xem Later).
-- Docker image **đã build end-to-end pass** (đã thêm `public/.gitkeep`); chưa verify chạy container + kết nối Postgres thực tế.
