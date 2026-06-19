@@ -45,6 +45,6 @@
 - **Auth là 1 mật khẩu single-user** (opt-in) — đủ cho self-host; chưa hỗ trợ nhiều người dùng/đổi mật khẩu trong UI.
 - **`minPayment` trong mô phỏng trả nợ** dùng ước tính theo gốc & kỳ hạn gốc (không theo dư nợ thực tế còn lại).
 - **Cột giá `Decimal(18,8)`** — đủ cho BTC theo VND hiện tại nhưng cần nới nếu giá/đơn vị vượt ~10 tỷ.
-- **Chưa có Docker daemon để verify** image build end-to-end (mới validate cú pháp + build Next).
+- Docker image **đã build end-to-end pass** (đã thêm `public/.gitkeep`); chưa verify chạy container + kết nối Postgres thực tế.
 - **`recharts`** — đã dùng cho biểu đồ dòng tiền (Báo cáo); có thể mở rộng cho Net Worth/giá theo thời gian.
 - **Chưa có lint config tùy chỉnh / test cho UI** (chỉ test công thức `lib/`).
