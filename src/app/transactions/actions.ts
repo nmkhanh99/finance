@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { TransactionType } from "@prisma/client";
 import { applyTransaction } from "@/lib/txCore";
+import { parseDateInput } from "@/lib/dateOnly";
 import { requireUserId } from "@/lib/currentUser";
 
 export async function createTransaction(formData: FormData) {
@@ -31,7 +32,7 @@ export async function createTransaction(formData: FormData) {
     if (!catOwned) return;
   }
 
-  const date = dateStr ? new Date(dateStr) : new Date();
+  const date = parseDateInput(dateStr);
 
   await prisma.$transaction((tx) =>
     applyTransaction(tx, { type, amount, date, note, accountId, toAccountId, categoryId, userId }),

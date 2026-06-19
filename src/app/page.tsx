@@ -6,6 +6,7 @@ import { evaluateBudget } from "@/lib/budget";
 import { convertToBase } from "@/lib/currency";
 import { loadRates } from "@/lib/rates";
 import { buildReminders } from "@/lib/reminders";
+import { monthStartUTC } from "@/lib/dateOnly";
 import { formatMoney, formatDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -28,8 +29,8 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
 export default async function DashboardPage() {
   const userId = await requireUserId();
   const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const monthStart = monthStartUTC(now);
+  const monthEnd = monthStartUTC(now, 1);
   const monthRange = { gte: monthStart, lt: monthEnd };
 
   const [nwb, accountCount, monthTxs, budgets, recent, debts, goals, rates] = await Promise.all([

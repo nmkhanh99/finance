@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/currentUser";
 import { formatMoney } from "@/lib/format";
 import { simulatePayoff, toDebtForSim, type DebtForSim } from "@/lib/finance";
+import { monthStartUTC } from "@/lib/dateOnly";
 import { convertToBase } from "@/lib/currency";
 import { loadRates } from "@/lib/rates";
 import CashFlowChart, { type MonthPoint } from "./CashFlowChart";
@@ -36,8 +37,8 @@ export default async function ReportsPage({
 
   // ----- Dòng tiền tháng hiện tại -----
   const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const monthStart = monthStartUTC(now);
+  const monthEnd = monthStartUTC(now, 1);
   const txs = await prisma.transaction.findMany({
     where: { userId, date: { gte: monthStart, lt: monthEnd }, type: { in: ["INCOME", "EXPENSE"] } },
     include: { category: true, account: { select: { currency: true } } },
@@ -60,7 +61,7 @@ export default async function ReportsPage({
   const maxCat = catRows[0]?.[1] ?? 0;
 
   // ----- Dòng tiền 6 tháng gần nhất (cho biểu đồ) -----
-  const chartStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+  const chartStart = monthStartUTC(now, -5);
   const recentTxs = await prisma.transaction.findMany({
     where: { userId, date: { gte: chartStart, lt: monthEnd }, type: { in: ["INCOME", "EXPENSE"] } },
     select: { type: true, amount: true, date: true, account: { select: { currency: true } } },
@@ -68,13 +69,13 @@ export default async function ReportsPage({
   const months: MonthPoint[] = [];
   const monthIndex = new Map<string, number>();
   for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    const d = monthStartUTC(now, -i);
+    const key = `${d.getUTCFullYear()}-${d.getUTCMonth()}`;
     monthIndex.set(key, months.length);
-    months.push({ month: `${d.getMonth() + 1}/${d.getFullYear()}`, thu: 0, chi: 0 });
+    months.push({ month: `${d.getUTCMonth() + 1}/${d.getUTCFullYear()}`, thu: 0, chi: 0 });
   }
   for (const t of recentTxs) {
-    const key = `${t.date.getFullYear()}-${t.date.getMonth()}`;
+    const key = `${t.date.getUTCFullYear()}-${t.date.getUTCMonth()}`;
     const idx = monthIndex.get(key);
     if (idx === undefined) continue;
     const amt = convertToBase(Number(t.amount), t.account.currency, rates);

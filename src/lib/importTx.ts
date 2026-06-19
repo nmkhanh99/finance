@@ -61,8 +61,10 @@ export function validateImportRows(
       return void errors.push(`Dòng ${line}: số tiền "${get("amount")}" không hợp lệ.`);
     }
 
-    const date = new Date(get("date"));
-    if (isNaN(date.getTime())) return void errors.push(`Dòng ${line}: ngày "${get("date")}" không hợp lệ.`);
+    const parsed = new Date(get("date"));
+    if (isNaN(parsed.getTime())) return void errors.push(`Dòng ${line}: ngày "${get("date")}" không hợp lệ.`);
+    // Chuẩn hoá về UTC-midnight (date-only) để khớp cột @db.Date.
+    const date = new Date(Date.UTC(parsed.getFullYear(), parsed.getMonth(), parsed.getDate()));
 
     const accountId = accByName.get(get("account").toLowerCase());
     if (!accountId) return void errors.push(`Dòng ${line}: tài khoản "${get("account")}" không tồn tại.`);

@@ -2,7 +2,7 @@
 
 export function addMonths(d: Date, n: number): Date {
   const x = new Date(d);
-  x.setMonth(x.getMonth() + n);
+  x.setUTCMonth(x.getUTCMonth() + n); // UTC để khớp ngày-chỉ @db.Date, không lệch múi giờ
   return x;
 }
 

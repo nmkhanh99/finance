@@ -11,7 +11,7 @@ function monthsUntil(target: Date): number {
   const now = new Date();
   if (target <= now) return 0;
   const months =
-    (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth());
+    (target.getUTCFullYear() - now.getUTCFullYear()) * 12 + (target.getUTCMonth() - now.getUTCMonth());
   return Math.max(months, 1); // còn trong tháng này -> tính 1 kỳ
 }
 

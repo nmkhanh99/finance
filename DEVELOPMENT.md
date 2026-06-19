@@ -35,6 +35,7 @@ src/
     auth.ts             # ký/verify cookie phiên HMAC (Web Crypto), mang userId
     currentUser.ts      # getCurrentUserId/requireUserId — SEAM resolve user (đổi 1 chỗ khi cắm IdP)
     userSetup.ts        # seedDefaultCategories — seed danh mục cho user mới
+    dateOnly.ts         # ngày-chỉ UTC-midnight (parseDateInput/monthStartUTC) — khớp @db.Date
     reminders.ts        # buildReminders + tiện ích ngày (Dashboard & email dùng chung)
     email.ts            # gửi email SMTP (nodemailer) + HTML nhắc nhở
     push.ts             # Web Push (web-push + VAPID) + payload nhắc nhở
@@ -129,6 +130,7 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 ## 10. Quyết định kỹ thuật quan trọng
 - **Server Actions thay vì REST**: đơn giản, 1 codebase, ít boilerplate.
 - **Lưu share chi phí tường minh** (không tính lại lúc đọc): đảm bảo bảo toàn tổng tiền dù chia đều hay tùy chỉnh.
+- **Ngày-chỉ = UTC-midnight + `@db.Date`**: tránh lệch múi giờ. Quy ước: ghi qua `parseDateInput`, lọc/nhóm tháng qua `monthStartUTC` + `getUTC*`, hiển thị qua `formatDate` (timeZone UTC). KHÔNG dùng `new Date(y,m,d)` (local) cho mốc lọc. `createdAt/updatedAt` và `RecurringTransaction.nextRun` vẫn là timestamp.
 - **Giá cache vào `PriceSnapshot`** thay vì gọi API mỗi lần render (tránh rate limit, có lịch sử giá).
 - **Dùng VNDirect thay TCBS**: endpoint public TCBS đã đổi/đóng (404). VNDirect cần header `User-Agent` kiểu trình duyệt (nếu thiếu → 406).
 - **Schema Postgres riêng `finance`**: tách khỏi `public`.

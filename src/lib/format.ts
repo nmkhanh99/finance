@@ -10,5 +10,6 @@ export function formatMoney(value: number | string, currency = "VND"): string {
 
 export function formatDate(d: Date | string): string {
   const date = typeof d === "string" ? new Date(d) : d;
-  return new Intl.DateTimeFormat("vi-VN", { dateStyle: "medium" }).format(date);
+  // timeZone UTC: ngày-chỉ lưu ở UTC-midnight (@db.Date) hiển thị đúng lịch dù server múi giờ nào.
+  return new Intl.DateTimeFormat("vi-VN", { dateStyle: "medium", timeZone: "UTC" }).format(date);
 }

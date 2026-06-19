@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { Prisma, TransactionType, RecurrenceFrequency } from "@prisma/client";
 import { runDueRecurring } from "@/lib/recurringRun";
+import { parseDateInput } from "@/lib/dateOnly";
 import { requireUserId } from "@/lib/currentUser";
 
 export async function createRecurring(formData: FormData) {
@@ -33,7 +34,7 @@ export async function createRecurring(formData: FormData) {
     if (!category) return;
   }
 
-  const startDate = startStr ? new Date(startStr) : new Date();
+  const startDate = parseDateInput(startStr);
 
   await prisma.recurringTransaction.create({
     data: {
@@ -47,7 +48,7 @@ export async function createRecurring(formData: FormData) {
       frequency,
       startDate,
       nextRun: startDate,
-      endDate: endStr ? new Date(endStr) : null,
+      endDate: endStr ? parseDateInput(endStr) : null,
     },
   });
   revalidatePath("/recurring");
@@ -78,8 +79,8 @@ export async function updateRecurring(formData: FormData) {
       amount: new Prisma.Decimal(amount),
       frequency,
       note,
-      ...(nextStr ? { nextRun: new Date(nextStr) } : {}),
-      endDate: endStr ? new Date(endStr) : null,
+      ...(nextStr ? { nextRun: parseDateInput(nextStr) } : {}),
+      endDate: endStr ? parseDateInput(endStr) : null,
     },
   });
   revalidatePath("/recurring");

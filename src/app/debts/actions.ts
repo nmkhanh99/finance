@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { DebtInterestType, Prisma } from "@prisma/client";
+import { parseDateInput } from "@/lib/dateOnly";
 import { requireUserId } from "@/lib/currentUser";
 
 export async function createDebt(formData: FormData) {
@@ -22,7 +23,7 @@ export async function createDebt(formData: FormData) {
       interestRate: new Prisma.Decimal(ratePercent / 100),
       interestType,
       termMonths,
-      startDate: startStr ? new Date(startStr) : new Date(),
+      startDate: parseDateInput(startStr),
       currency: "VND",
       userId,
     },
@@ -59,7 +60,7 @@ export async function addPayment(formData: FormData) {
       amount: new Prisma.Decimal(amount),
       principal: new Prisma.Decimal(principal),
       interest: new Prisma.Decimal(interest),
-      date: dateStr ? new Date(dateStr) : new Date(),
+      date: parseDateInput(dateStr),
     },
   });
   revalidatePath("/debts");

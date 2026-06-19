@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
+import { parseDateInput } from "@/lib/dateOnly";
 import { requireUserId } from "@/lib/currentUser";
 
 export async function createGoal(formData: FormData) {
@@ -18,7 +19,7 @@ export async function createGoal(formData: FormData) {
       name,
       targetAmount: new Prisma.Decimal(targetAmount),
       currentSaved: new Prisma.Decimal(currentSaved),
-      targetDate: new Date(targetStr),
+      targetDate: parseDateInput(targetStr),
       currency: "VND",
       userId,
     },

@@ -7,6 +7,7 @@ import { Prisma, SplitType } from "@prisma/client";
 import { equalSplit } from "@/lib/split";
 import { applyTransaction } from "@/lib/txCore";
 import { loadRates } from "@/lib/rates";
+import { parseDateInput } from "@/lib/dateOnly";
 import { requireUserId } from "@/lib/currentUser";
 
 export async function createGroup(formData: FormData) {
@@ -113,7 +114,7 @@ export async function addExpense(formData: FormData) {
   const amount = shares.reduce((s, x) => s + x.amount, 0);
   if (amount <= 0) return;
 
-  const date = dateStr ? new Date(dateStr) : new Date();
+  const date = parseDateInput(dateStr);
 
   // Nếu người trả là "bạn" (self): tuỳ chọn trừ tiền từ một hoặc NHIỀU tài khoản
   // (số tiền theo tiền tệ của từng tài khoản) -> sinh giao dịch chi liên kết với khoản này.
@@ -226,7 +227,7 @@ export async function recordSettlement(formData: FormData) {
   const to = memberById.get(toMemberId);
   if (!from || !to) return;
 
-  const date = dateStr ? new Date(dateStr) : new Date();
+  const date = parseDateInput(dateStr);
 
   // Tài khoản (nếu chọn) phải thuộc user; chỉ tạo giao dịch khi "bạn" là 1 trong 2 phía.
   let account: { id: string; currency: string } | null = null;

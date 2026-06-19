@@ -117,7 +117,7 @@ model Transaction {
   id        String          @id @default(cuid())
   type      TransactionType
   amount    Decimal         @db.Decimal(18, 2)
-  date      DateTime // ngày phát sinh
+  date      DateTime        @db.Date // ngày phát sinh (date-only, UTC)
   note      String?
   createdAt DateTime        @default(now())
 
@@ -196,7 +196,7 @@ model Debt {
   interestRate Decimal          @db.Decimal(9, 6) // lãi suất NĂM, dạng thập phân (0.12 = 12%/năm)
   interestType DebtInterestType @default(AMORTIZING)
   termMonths   Int // kỳ hạn (tháng)
-  startDate    DateTime
+  startDate    DateTime         @db.Date
   currency     String           @default("VND")
   note         String?
   createdAt    DateTime         @default(now())
@@ -217,7 +217,7 @@ model DebtPayment {
   amount    Decimal  @db.Decimal(18, 2) // tổng trả kỳ này
   principal Decimal  @db.Decimal(18, 2) // phần gốc
   interest  Decimal  @db.Decimal(18, 2) // phần lãi
-  date      DateTime
+  date      DateTime @db.Date
   createdAt DateTime @default(now())
 
   @@index([debtId, date])
@@ -230,7 +230,7 @@ model Goal {
   name         String
   targetAmount Decimal  @db.Decimal(18, 2)
   currentSaved Decimal  @default(0) @db.Decimal(18, 2)
-  targetDate   DateTime
+  targetDate   DateTime @db.Date
   currency     String   @default("VND")
   note         String?
   createdAt    DateTime @default(now())
@@ -287,7 +287,7 @@ model TripExpense {
   description String // nội dung chi phí (bắt buộc)
   amount      Decimal    @db.Decimal(18, 2)
   currency    String     @default("VND") // tiền tệ của khoản chi (amount & shares theo mã này)
-  date        DateTime
+  date        DateTime   @db.Date
   splitType   SplitType  @default(EQUAL)
   payer       TripMember @relation("ExpensePayer", fields: [payerId], references: [id])
   payerId     String
@@ -310,7 +310,7 @@ model TripSettlement {
   toMember      TripMember @relation("SettleTo", fields: [toMemberId], references: [id], onDelete: Cascade)
   toMemberId    String
   amount        Decimal    @db.Decimal(18, 2) // VND
-  date          DateTime
+  date          DateTime   @db.Date
   transactionId String? // giao dịch cá nhân liên kết (nếu có)
   createdAt     DateTime   @default(now())
 
@@ -343,9 +343,9 @@ model RecurringTransaction {
   categoryId  String?
   note        String?
   frequency   RecurrenceFrequency
-  startDate   DateTime
-  nextRun     DateTime // thời điểm sinh giao dịch kế tiếp
-  endDate     DateTime?
+  startDate   DateTime            @db.Date
+  nextRun     DateTime // thời điểm sinh giao dịch kế tiếp (giữ timestamp — cursor lịch)
+  endDate     DateTime?           @db.Date
   active      Boolean             @default(true)
   createdAt   DateTime            @default(now())
 

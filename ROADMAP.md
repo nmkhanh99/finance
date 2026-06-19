@@ -33,6 +33,7 @@
 - Nhắc nợ/mục tiêu đến hạn qua **email** (SMTP/nodemailer): `User.email` + trang Cài đặt + cron `/api/reminders/email`.
 - Nhắc qua **Web Push** (service worker + VAPID, `web-push`): `PushSubscription` + bật/tắt theo thiết bị + cron `/api/reminders/push`.
 - Lint (ESLint flat config `next/core-web-vitals` + TS) chạy sạch; hạ tầng test UI (vitest + jsdom + Testing Library) + test mẫu ThemeToggle.
+- Ngày-chỉ chuyển sang `@db.Date` (UTC-midnight): hết lệch +7h. Helper `dateOnly.ts`, mọi chỗ ghi/lọc/nhóm/hiển thị dùng UTC nhất quán.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
@@ -47,7 +48,6 @@
 - Mở rộng danh sách mã crypto hỗ trợ / nhập `priceId` tùy chỉnh.
 
 ## Technical Debt
-- **Date dùng `timestamp` không-timezone** (lệch +7h) — cân nhắc đổi sang `@db.Date` cho các trường ngày.
 - **Đăng nhập chưa có mật khẩu** (chỉ username) — cần cắm Keycloak/OIDC + trang quản lý user (xem Later).
 - Docker image **đã build end-to-end pass** (đã thêm `public/.gitkeep`); chưa verify chạy container + kết nối Postgres thực tế.
 - **`recharts`** — đã dùng cho biểu đồ dòng tiền (Báo cáo); có thể mở rộng cho Net Worth/giá theo thời gian.

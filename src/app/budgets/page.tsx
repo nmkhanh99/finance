@@ -3,6 +3,7 @@ import { formatMoney } from "@/lib/format";
 import { evaluateBudget } from "@/lib/budget";
 import { convertToBase } from "@/lib/currency";
 import { loadRates } from "@/lib/rates";
+import { monthStartUTC } from "@/lib/dateOnly";
 import { requireUserId } from "@/lib/currentUser";
 import { setBudget } from "./actions";
 
@@ -11,8 +12,8 @@ export const dynamic = "force-dynamic";
 export default async function BudgetsPage() {
   const userId = await requireUserId();
   const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const monthStart = monthStartUTC(now);
+  const monthEnd = monthStartUTC(now, 1);
 
   const [categories, monthTxs, rates] = await Promise.all([
     prisma.category.findMany({
