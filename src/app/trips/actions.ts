@@ -58,6 +58,7 @@ export async function addExpense(formData: FormData) {
   const payerId = String(formData.get("payerId") ?? "");
   const dateStr = String(formData.get("date") ?? "");
   const splitType = (String(formData.get("splitType") ?? "EQUAL") as SplitType) || "EQUAL";
+  const currency = (String(formData.get("currency") ?? "VND").trim().toUpperCase() || "VND").slice(0, 5);
   const participantIds = formData.getAll("participants").map(String).filter(Boolean);
 
   if (!groupId || !description || !payerId || participantIds.length === 0) return;
@@ -81,7 +82,9 @@ export async function addExpense(formData: FormData) {
     }));
   } else {
     const total = Number(formData.get("amount") ?? 0) || 0;
-    const parts = equalSplit(total, participantIds.length);
+    // VND chia theo đồng (số nguyên); tiền tệ khác cho phép 2 số lẻ (chia theo "cent").
+    const scale = currency === "VND" ? 1 : 100;
+    const parts = equalSplit(total * scale, participantIds.length).map((p) => p / scale);
     shares = participantIds.map((id, i) => ({ memberId: id, amount: parts[i] }));
   }
 
@@ -95,6 +98,7 @@ export async function addExpense(formData: FormData) {
       groupId,
       description,
       amount: new Prisma.Decimal(amount),
+      currency,
       date,
       splitType,
       payerId,

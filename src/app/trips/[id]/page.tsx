@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/currentUser";
 import { formatMoney, formatDate } from "@/lib/format";
 import { settle, type Balance } from "@/lib/split";
+import { loadRates } from "@/lib/rates";
+import { convertToBase } from "@/lib/currency";
 import { addMember, deleteMember, deleteExpense, deleteGroup } from "../actions";
 import ExpenseForm from "./ExpenseForm";
 
@@ -24,9 +26,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   });
   if (!group) notFound();
 
-  const nameById = new Map(group.members.map((m) => [m.id, m.name]));
+  // Báo cáo cân bằng & thanh toán tính bằng VND (quy đổi mỗi khoản theo tiền tệ của nó).
+  const rates = await loadRates();
 
-  // Tính paid / owed / net mỗi người
+  // Tính paid / owed / net mỗi người (đã quy đổi VND)
   const paid = new Map<string, number>();
   const owed = new Map<string, number>();
   for (const m of group.members) {
@@ -35,11 +38,11 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   }
   let total = 0;
   for (const e of group.expenses) {
-    const amt = Number(e.amount);
+    const amt = convertToBase(Number(e.amount), e.currency, rates);
     total += amt;
     paid.set(e.payerId, (paid.get(e.payerId) ?? 0) + amt);
     for (const s of e.shares) {
-      owed.set(s.memberId, (owed.get(s.memberId) ?? 0) + Number(s.amount));
+      owed.set(s.memberId, (owed.get(s.memberId) ?? 0) + convertToBase(Number(s.amount), e.currency, rates));
     }
   }
   const balances: Balance[] = group.members.map((m) => {
@@ -114,7 +117,14 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-semibold text-amber-400">{formatMoney(Number(e.amount))}</span>
+                  <div className="text-right">
+                    <span className="font-semibold text-amber-400">{formatMoney(Number(e.amount), e.currency)}</span>
+                    {e.currency !== "VND" && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        ≈ {formatMoney(convertToBase(Number(e.amount), e.currency, rates))}
+                      </div>
+                    )}
+                  </div>
                   <form action={deleteExpense}>
                     <input type="hidden" name="id" value={e.id} />
                     <input type="hidden" name="groupId" value={group.id} />
@@ -156,7 +166,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-gray-600 dark:text-gray-500">Chênh lệch dương: nhóm nợ bạn. Âm: bạn cần trả lại nhóm.</p>
+          <p className="text-xs text-gray-600 dark:text-gray-500">Số tiền đã quy đổi về VND theo tỷ giá. Chênh lệch dương: nhóm nợ bạn. Âm: bạn cần trả lại nhóm.</p>
 
           {/* Phương án thanh toán */}
           <div className="space-y-2">

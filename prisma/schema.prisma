@@ -262,6 +262,7 @@ model TripExpense {
   groupId     String
   description String // nội dung chi phí (bắt buộc)
   amount      Decimal    @db.Decimal(18, 2)
+  currency    String     @default("VND") // tiền tệ của khoản chi (amount & shares theo mã này)
   date        DateTime
   splitType   SplitType  @default(EQUAL)
   payer       TripMember @relation("ExpensePayer", fields: [payerId], references: [id])

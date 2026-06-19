@@ -5,6 +5,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 ## 2026-06-19
 
 ### Added
+- **Đa tiền tệ cho Chia tiền nhóm**: mỗi khoản chi nhóm có tiền tệ riêng (ô "Tiền tệ" khi thêm chi phí, mặc định VND). Danh sách hiện số gốc + "≈ VND"; báo cáo cân bằng & phương án thanh toán quy đổi mọi khoản về VND theo tỷ giá (`convertToBase`/`loadRates`). Chia đều cho phép 2 số lẻ với tiền tệ ≠ VND. Thêm cột `TripExpense.currency` (migration `trip_currency`, hàng cũ → VND).
 - **Multi-user (đăng nhập bằng username)**: mỗi người dùng có dữ liệu riêng (tài khoản, giao dịch, đầu tư, nợ, mục tiêu, ngân sách, định kỳ, nhóm chia tiền). Màn đăng nhập nhập username — chưa có sẽ tự tạo (kèm seed danh mục mặc định), chưa cần mật khẩu. Thanh nav hiện `@username` + Đăng xuất. Dữ liệu cũ được gán user `default` (đăng nhập `default` để xem). Thiết kế sẵn `User.externalId` + lớp `getCurrentUserId()` để cắm Keycloak/OIDC sau mà không phải sửa query.
 - **Giao diện Sáng / Tối / Theo hệ thống**: nút ☀️/🌙/🖥️ trên thanh nav (cycle), lưu lựa chọn vào `localStorage`; mặc định theo hệ điều hành và tự đổi khi đổi chế độ hệ thống. Dark bật bằng class `.dark` trên `<html>` (Tailwind `@custom-variant dark`), script inline chống nhấp nháy khi tải. `src/app/ThemeToggle.tsx`; biến màu light/dark + token chart trong `globals.css`; charts đọc màu qua CSS var. Toàn bộ 21 file UI chuyển class dark-only → cặp light + `dark:`.
 - **Tự cập nhật tỷ giá từ API** (open.er-api.com): nút trên trang Tỷ giá + endpoint cron `/api/rates/refresh`; `src/lib/fxRates.ts`.

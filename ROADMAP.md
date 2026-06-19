@@ -27,6 +27,7 @@
 - Tự cập nhật tỷ giá từ API (open.er-api.com) + cron.
 - Giao diện Sáng / Tối / Theo hệ thống (ThemeToggle + class `.dark`, chống nhấp nháy, charts theo CSS var).
 - Multi-user: đăng nhập bằng username, dữ liệu cách ly theo user (userId mọi bảng cá nhân, chống IDOR); seam `getCurrentUserId()` sẵn cho IdP.
+- Đa tiền tệ cho Chia tiền nhóm (TripExpense.currency, báo cáo quy đổi VND).
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
@@ -34,7 +35,6 @@
 
 ## Next
 - **Nhắc qua email/push** (hiện chỉ nhắc trong app).
-- **Quy đổi tiền tệ cho phần chia tiền nhóm** (hiện giả định cùng tiền tệ).
 
 ## Later
 - **Bảo mật đăng nhập thật (Keycloak/OIDC)**: hiện chỉ nhập username không mật khẩu. Cắm IdP qua `User.externalId` (map `sub`) + đổi thân `getCurrentUserId()` trong `src/lib/currentUser.ts` — không phải sửa query. Kèm: trang quản lý user / đổi username, xoá user.

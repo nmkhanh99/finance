@@ -10,7 +10,9 @@ interface Member {
 
 export default function ExpenseForm({ groupId, members }: { groupId: string; members: Member[] }) {
   const [mode, setMode] = useState<"EQUAL" | "CUSTOM">("EQUAL");
+  const [currency, setCurrency] = useState("VND");
   const [selected, setSelected] = useState<Set<string>>(new Set(members.map((m) => m.id)));
+  const cur = currency.trim().toUpperCase() || "VND";
 
   function toggle(id: string) {
     setSelected((prev) => {
@@ -48,6 +50,19 @@ export default function ExpenseForm({ groupId, members }: { groupId: string; mem
         <input name="date" type="date" className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
       </label>
 
+      <label className="flex flex-col text-sm">
+        <span className="mb-1 text-gray-500 dark:text-gray-400">Tiền tệ</span>
+        <input
+          name="currency"
+          value={currency}
+          onChange={(e) => setCurrency(e.target.value)}
+          maxLength={5}
+          placeholder="VND"
+          className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2 uppercase"
+        />
+        <span className="mt-1 text-xs text-gray-500 dark:text-gray-400">Báo cáo quy đổi về VND theo tỷ giá (trang Tỷ giá).</span>
+      </label>
+
       {/* Chế độ chia */}
       <div className="flex items-center gap-2 text-sm sm:col-span-2">
         <span className="text-gray-500 dark:text-gray-400">Cách chia:</span>
@@ -69,7 +84,7 @@ export default function ExpenseForm({ groupId, members }: { groupId: string; mem
 
       {mode === "EQUAL" && (
         <label className="flex flex-col text-sm sm:col-span-2">
-          <span className="mb-1 text-gray-500 dark:text-gray-400">Tổng số tiền (VND) — chia đều cho người được chọn</span>
+          <span className="mb-1 text-gray-500 dark:text-gray-400">Tổng số tiền ({cur}) — chia đều cho người được chọn</span>
           <input name="amount" type="number" step="1000" min="0" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
       )}
@@ -77,7 +92,7 @@ export default function ExpenseForm({ groupId, members }: { groupId: string; mem
       {/* Người tham gia */}
       <div className="sm:col-span-2">
         <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-          Chia cho ({selected.size} người){mode === "CUSTOM" ? " — nhập số tiền mỗi người" : ""}:
+          Chia cho ({selected.size} người){mode === "CUSTOM" ? ` — nhập số tiền mỗi người (${cur})` : ""}:
         </div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {members.map((m) => {

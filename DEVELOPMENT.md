@@ -112,14 +112,14 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 
 **Chia tiền nhóm (độc lập):**
 - `TripGroup` → `TripMember`, `TripExpense`
-- `TripExpense` (description, amount, date, EQUAL|CUSTOM, payerId) → `TripExpenseShare` (memberId, amount)
+- `TripExpense` (description, amount, currency, date, EQUAL|CUSTOM, payerId) → `TripExpenseShare` (memberId, amount). amount & shares theo `currency` của khoản; báo cáo quy đổi VND.
 
 ## 9. Luồng xử lý chính
 - **Net Worth** = Σ số dư tài khoản + Σ(qty × giá thị trường) − Σ dư nợ. Giá thị trường = `PriceSnapshot` mới nhất, fallback `avgCost`.
 - **Giao dịch**: tạo/xoá trong `$transaction` → cập nhật số dư `Account` (income +, expense −, transfer chuyển giữa 2 account).
 - **Cập nhật giá**: `lib/prices.ts` → crypto qua CoinGecko (VND), cổ phiếu VN qua VNDirect dchart (×1000). Ghi `PriceSnapshot`. Gọi qua nút trên trang Đầu tư hoặc `GET /api/prices/refresh` (cron).
 - **Trả nợ ghi nhận**: tự tách lãi (dư nợ × lãi tháng) và gốc.
-- **Chia tiền nhóm**: mỗi `TripExpense` lưu share từng người → tính paid/owed/net mỗi người → `settle()` cho phương án chuyển tối thiểu.
+- **Chia tiền nhóm**: mỗi `TripExpense` lưu share từng người (theo `currency` của khoản) → quy đổi VND (`convertToBase`/`loadRates`) → tính paid/owed/net mỗi người → `settle()` cho phương án chuyển tối thiểu. Chia đều dùng `equalSplit` (VND số nguyên; tiền tệ khác scale ×100 cho 2 số lẻ).
 
 ## 10. Quyết định kỹ thuật quan trọng
 - **Server Actions thay vì REST**: đơn giản, 1 codebase, ít boilerplate.
