@@ -23,7 +23,51 @@ export const CRYPTO_IDS: Record<string, string> = {
   SHIB: "shiba-inu",
   LTC: "litecoin",
   BCH: "bitcoin-cash",
+  UNI: "uniswap",
+  ATOM: "cosmos",
+  ETC: "ethereum-classic",
+  XLM: "stellar",
+  XMR: "monero",
+  FIL: "filecoin",
+  APT: "aptos",
+  SUI: "sui",
+  ARB: "arbitrum",
+  OP: "optimism",
+  IMX: "immutable-x",
+  INJ: "injective-protocol",
+  SEI: "sei-network",
+  FTM: "fantom",
+  ALGO: "algorand",
+  VET: "vechain",
+  HBAR: "hedera-hashgraph",
+  AAVE: "aave",
+  MKR: "maker",
+  GRT: "the-graph",
+  SAND: "the-sandbox",
+  MANA: "decentraland",
+  AXS: "axie-infinity",
+  CRO: "crypto-com-chain",
+  QNT: "quant-network",
+  KAS: "kaspa",
+  TIA: "celestia",
+  STX: "blockstack",
+  RNDR: "render-token",
+  FET: "fetch-ai",
+  WIF: "dogwifcoin",
+  BONK: "bonk",
+  JUP: "jupiter-exchange-solana",
+  ENA: "ethena",
 };
+
+/**
+ * CoinGecko coin id cho 1 holding: ưu tiên `priceId` tùy chỉnh, fallback map theo symbol.
+ * null nếu không xác định được (sẽ bị skip khi cập nhật giá).
+ */
+export function resolveCoinId(symbol: string, priceId?: string | null): string | null {
+  const custom = priceId?.trim().toLowerCase();
+  if (custom) return custom;
+  return CRYPTO_IDS[symbol.trim().toUpperCase()] ?? null;
+}
 
 /** Lấy giá (VND) theo danh sách CoinGecko id. Ném lỗi nếu request fail. */
 export async function fetchCryptoPricesVND(ids: string[]): Promise<Record<string, number>> {
@@ -79,22 +123,17 @@ export async function refreshCryptoPrices(userId?: string): Promise<RefreshResul
   const holdings = await prisma.holding.findMany({
     where: { assetType: "CRYPTO", ...(userId ? { userId } : {}) },
   });
-  const idBySymbol: Record<string, string> = {};
-  const skipped: string[] = [];
-  for (const h of holdings) {
-    const id = CRYPTO_IDS[h.symbol.toUpperCase()];
-    if (id) idBySymbol[h.symbol] = id;
-    else skipped.push(h.symbol);
-  }
+  // Mỗi holding tự xác định coin id (priceId tùy chỉnh > map theo symbol).
+  const resolved = holdings.map((h) => ({ h, id: resolveCoinId(h.symbol, h.priceId) }));
+  const skipped = resolved.filter((r) => !r.id).map((r) => r.h.symbol);
 
-  const ids = [...new Set(Object.values(idBySymbol))];
+  const ids = [...new Set(resolved.map((r) => r.id).filter((x): x is string => !!x))];
   if (ids.length === 0) return { updated: 0, skipped };
 
   try {
     const prices = await fetchCryptoPricesVND(ids);
     let updated = 0;
-    for (const h of holdings) {
-      const id = idBySymbol[h.symbol];
+    for (const { h, id } of resolved) {
       const price = id ? prices[id] : undefined;
       if (price == null) continue;
       await prisma.priceSnapshot.create({

@@ -35,6 +35,7 @@
 - Lint (ESLint flat config `next/core-web-vitals` + TS) chạy sạch; hạ tầng test UI (vitest + jsdom + Testing Library) + test mẫu ThemeToggle.
 - Ngày-chỉ chuyển sang `@db.Date` (UTC-midnight): hết lệch +7h. Helper `dateOnly.ts`, mọi chỗ ghi/lọc/nhóm/hiển thị dùng UTC nhất quán.
 - Import sao kê ngân hàng map cột linh hoạt (`importBank.ts`): chọn tài khoản + map Ngày/Số tiền (1 cột hoặc Nợ-Có)/Nội dung; parser số & ngày đa định dạng.
+- Mã crypto: mở rộng map (~50) + `Holding.priceId` (CoinGecko ID tùy chỉnh, `resolveCoinId`) → cập nhật giá bất kỳ coin nào.
 - **Verify Docker end-to-end thật**: `docker compose up --build` — Postgres healthy, migrate chạy đủ 14 migration + seed (cả DB cũ lẫn fresh volume), web phục vụ & query Postgres OK, cron up.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
@@ -46,7 +47,6 @@
 
 ## Later
 - **Bảo mật đăng nhập thật (Keycloak/OIDC)**: hiện chỉ nhập username không mật khẩu. Cắm IdP qua `User.externalId` (map `sub`) + đổi thân `getCurrentUserId()` trong `src/lib/currentUser.ts` — không phải sửa query. Kèm: trang quản lý user / đổi username, xoá user.
-- Mở rộng danh sách mã crypto hỗ trợ / nhập `priceId` tùy chỉnh.
 
 ## Technical Debt
 - **Đăng nhập chưa có mật khẩu** (chỉ username) — cần cắm Keycloak/OIDC + trang quản lý user (xem Later).

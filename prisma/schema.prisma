@@ -158,6 +158,7 @@ model Holding {
   quantity  Decimal   @db.Decimal(28, 8) // crypto có phần lẻ lớn
   avgCost   Decimal   @db.Decimal(24, 8) // giá vốn trung bình / đơn vị
   currency  String    @default("VND")
+  priceId   String? // CoinGecko coin id tùy chỉnh (vd "bitcoin") — ưu tiên hơn map theo symbol
   note      String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

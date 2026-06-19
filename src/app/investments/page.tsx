@@ -149,6 +149,10 @@ export default async function InvestmentsPage({
           <span className="mb-1 text-gray-500 dark:text-gray-400">Tiền tệ</span>
           <input name="currency" defaultValue="VND" maxLength={5} className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2 uppercase" />
         </label>
+        <label className="flex flex-col text-sm">
+          <span className="mb-1 text-gray-500 dark:text-gray-400">CoinGecko ID</span>
+          <input name="priceId" placeholder="vd: bitcoin (chỉ crypto)" className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
+        </label>
         <button className="self-end rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black hover:bg-emerald-400">
           + Thêm / Mua thêm
         </button>
@@ -179,7 +183,10 @@ export default async function InvestmentsPage({
                 <tr key={h.id} className="border-b border-black/5 dark:border-white/5">
                   <td className="py-3 pr-3">
                     <div className="font-medium">{h.symbol}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-500">{ASSET_LABEL[h.assetType]}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-500">
+                      {ASSET_LABEL[h.assetType]}
+                      {h.priceId ? ` · ${h.priceId}` : ""}
+                    </div>
                   </td>
                   <td className="py-3 pr-3">{qty}</td>
                   <td className="py-3 pr-3">{formatMoney(avgCost, h.currency)}</td>

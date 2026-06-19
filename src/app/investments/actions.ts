@@ -16,6 +16,8 @@ export async function createHolding(formData: FormData) {
   const quantity = Number(formData.get("quantity") ?? 0);
   const avgCost = Number(formData.get("avgCost") ?? 0);
   const currency = (String(formData.get("currency") ?? "VND").trim().toUpperCase() || "VND").slice(0, 5);
+  // CoinGecko coin id tùy chỉnh (chỉ ý nghĩa cho crypto). Bỏ trống = dùng map theo symbol.
+  const priceId = String(formData.get("priceId") ?? "").trim().toLowerCase() || null;
   if (!symbol || quantity <= 0 || avgCost < 0) return;
 
   const existing = await prisma.holding.findFirst({
@@ -29,11 +31,12 @@ export async function createHolding(formData: FormData) {
       data: {
         quantity: { increment: new Prisma.Decimal(quantity) },
         avgCost: new Prisma.Decimal(newAvg),
+        ...(priceId ? { priceId } : {}), // chỉ ghi đè khi người dùng nhập
       },
     });
   } else {
     await prisma.holding.create({
-      data: { symbol, assetType, quantity, avgCost, currency, userId },
+      data: { symbol, assetType, quantity, avgCost, currency, priceId, userId },
     });
   }
   revalidatePath("/investments");
