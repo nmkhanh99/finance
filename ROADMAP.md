@@ -28,6 +28,7 @@
 - Giao diện Sáng / Tối / Theo hệ thống (ThemeToggle + class `.dark`, chống nhấp nháy, charts theo CSS var).
 - Multi-user: đăng nhập bằng username, dữ liệu cách ly theo user (userId mọi bảng cá nhân, chống IDOR); seam `getCurrentUserId()` sẵn cho IdP.
 - Đa tiền tệ cho Chia tiền nhóm (TripExpense.currency, báo cáo quy đổi VND).
+- Mô phỏng trả nợ chính xác hơn: minPayment = khoản góp cố định theo GỐC & kỳ hạn ban đầu (`toDebtForSim`/`minimumMonthlyPayment`), không hạ thấp theo dư nợ còn lại.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
@@ -45,8 +46,7 @@
 
 ## Technical Debt
 - **Date dùng `timestamp` không-timezone** (lệch +7h) — cân nhắc đổi sang `@db.Date` cho các trường ngày.
-- **Auth là 1 mật khẩu single-user** (opt-in) — đủ cho self-host; chưa hỗ trợ nhiều người dùng/đổi mật khẩu trong UI.
-- **`minPayment` trong mô phỏng trả nợ** dùng ước tính theo gốc & kỳ hạn gốc (không theo dư nợ thực tế còn lại).
+- **Đăng nhập chưa có mật khẩu** (chỉ username) — cần cắm Keycloak/OIDC + trang quản lý user (xem Later).
 - **Cột giá `Decimal(18,8)`** — đủ cho BTC theo VND hiện tại nhưng cần nới nếu giá/đơn vị vượt ~10 tỷ.
 - Docker image **đã build end-to-end pass** (đã thêm `public/.gitkeep`); chưa verify chạy container + kết nối Postgres thực tế.
 - **`recharts`** — đã dùng cho biểu đồ dòng tiền (Báo cáo); có thể mở rộng cho Net Worth/giá theo thời gian.

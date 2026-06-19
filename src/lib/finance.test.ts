@@ -9,6 +9,8 @@ import {
   amortizationSchedule,
   requiredMonthlySaving,
   simulatePayoff,
+  minimumMonthlyPayment,
+  toDebtForSim,
   type DebtForSim,
 } from "./finance";
 
@@ -112,5 +114,32 @@ describe("simulatePayoff avalanche vs snowball", () => {
     const av = simulatePayoff(debts, 3_000_000, "avalanche");
     const sn = simulatePayoff(debts, 3_000_000, "snowball");
     expect(av.totalInterest).toBeLessThanOrEqual(sn.totalInterest);
+  });
+});
+
+describe("minimumMonthlyPayment / toDebtForSim", () => {
+  it("rate 0 -> chia đều gốc theo kỳ hạn", () => {
+    expect(minimumMonthlyPayment(12_000_000, 0, 12)).toBe(1_000_000);
+  });
+  it("term 0 -> trả 1 lần (toàn gốc)", () => {
+    expect(minimumMonthlyPayment(5_000_000, 0.1, 0)).toBe(5_000_000);
+  });
+  it("toDebtForSim: balance = gốc − đã trả; minPayment theo GỐC, KHÔNG theo dư nợ", () => {
+    const sim = toDebtForSim({
+      id: "x",
+      name: "vay",
+      principal: 100_000_000,
+      annualRate: 0.12,
+      termMonths: 12,
+      paidPrincipal: 60_000_000,
+    });
+    expect(sim.balance).toBe(40_000_000); // dư nợ thực = gốc − đã trả
+    // minPayment = góp cố định theo gốc 100tr (~8.884.879), KHÔNG phải theo 40tr
+    expect(sim.minPayment).toBeCloseTo(minimumMonthlyPayment(100_000_000, 0.12, 12), 0);
+  });
+  it("fix: minPayment theo gốc LỚN HƠN cách cũ (tính theo dư nợ còn lại)", () => {
+    const byPrincipal = minimumMonthlyPayment(100_000_000, 0.12, 12);
+    const oldByBalance = amortizingMonthlyPayment(40_000_000, 0.12, 12); // cách cũ (sai)
+    expect(byPrincipal).toBeGreaterThan(oldByBalance);
   });
 });

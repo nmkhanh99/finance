@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/currentUser";
 import { formatMoney } from "@/lib/format";
-import { simulatePayoff, amortizingMonthlyPayment, type DebtForSim } from "@/lib/finance";
+import { simulatePayoff, toDebtForSim, type DebtForSim } from "@/lib/finance";
 import { convertToBase } from "@/lib/currency";
 import { loadRates } from "@/lib/rates";
 import CashFlowChart, { type MonthPoint } from "./CashFlowChart";
@@ -84,19 +84,18 @@ export default async function ReportsPage({
 
   // ----- Trả nợ: Avalanche vs Snowball -----
   const debts = await prisma.debt.findMany({ where: { userId }, include: { payments: true } });
-  const simDebts: DebtForSim[] = debts.map((d) => {
-    const principal = Number(d.principal);
-    const rate = Number(d.interestRate);
-    const paid = d.payments.reduce((s, p) => s + Number(p.principal), 0);
-    const balance = Math.max(principal - paid, 0);
-    return {
-      id: d.id,
-      name: d.name,
-      balance,
-      annualRate: rate,
-      minPayment: amortizingMonthlyPayment(balance || 1, rate, d.termMonths),
-    };
-  }).filter((d) => d.balance > 0);
+  const simDebts: DebtForSim[] = debts
+    .map((d) =>
+      toDebtForSim({
+        id: d.id,
+        name: d.name,
+        principal: Number(d.principal),
+        annualRate: Number(d.interestRate),
+        termMonths: d.termMonths,
+        paidPrincipal: d.payments.reduce((s, p) => s + Number(p.principal), 0),
+      }),
+    )
+    .filter((d) => d.balance > 0);
 
   const avalanche = simDebts.length ? simulatePayoff(simDebts, extra, "avalanche") : null;
   const snowball = simDebts.length ? simulatePayoff(simDebts, extra, "snowball") : null;

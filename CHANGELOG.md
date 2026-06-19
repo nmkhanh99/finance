@@ -38,6 +38,7 @@ Mọi thay đổi đáng chú ý của dự án. Format: `## YYYY-MM-DD` với A
 - Nút cập nhật giá đổi từ "Cập nhật giá crypto" → "Cập nhật giá" (gộp crypto + chứng khoán VN).
 
 ### Fixed
+- **Mô phỏng trả nợ (Avalanche/Snowball) sai khoản tối thiểu**: minPayment trước tính theo *dư nợ còn lại* nên thấp hơn nghĩa vụ thực → overstate số tháng & tổng lãi. Nay tính theo **gốc & kỳ hạn ban đầu** (khoản góp cố định) qua `toDebtForSim`/`minimumMonthlyPayment` trong `src/lib/finance.ts` (+4 test). Trang Báo cáo dùng helper này.
 - Docker build fail ở bước `COPY /app/public` (`"/app/public": not found`) do project chưa có thư mục `public/` → thêm `public/.gitkeep`. Build end-to-end pass.
 - Tính số tháng còn lại của Mục tiêu sai (1 năm thành 13 tháng) do timestamp không-timezone lệch +7h → chuyển sang tính theo lịch (year/month).
 - VNDirect trả HTTP 406 với Node fetch → thêm header `User-Agent` kiểu trình duyệt.

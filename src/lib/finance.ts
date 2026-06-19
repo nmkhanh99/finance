@@ -208,3 +208,43 @@ export function simulatePayoff(
     totalPaid: round2(totalPaid),
   };
 }
+
+/**
+ * Khoản trả tối thiểu/tháng cho mô phỏng = tiền góp cố định (annuity) theo
+ * GỐC & KỲ HẠN BAN ĐẦU. Đây là nghĩa vụ thực mỗi tháng của khoản trả góp, KHÔNG
+ * đổi theo dư nợ còn lại; áp lên dư nợ hiện tại vẫn tất toán đúng tiến độ.
+ */
+export function minimumMonthlyPayment(
+  originalPrincipal: number,
+  annualRate: number,
+  termMonths: number,
+): number {
+  if (originalPrincipal <= 0) return 0;
+  if (termMonths <= 0) return round2(originalPrincipal); // không kỳ hạn -> coi như trả 1 lần
+  return amortizingMonthlyPayment(originalPrincipal, annualRate, termMonths);
+}
+
+export interface DebtInput {
+  id: string;
+  name: string;
+  principal: number; // gốc ban đầu
+  annualRate: number;
+  termMonths: number;
+  paidPrincipal: number; // tổng gốc đã trả
+}
+
+/**
+ * Chuyển khoản nợ thô -> input mô phỏng trả nợ:
+ *  - balance = gốc ban đầu − tổng gốc đã trả (dư nợ thực còn lại)
+ *  - minPayment = tiền góp cố định theo GỐC & KỲ HẠN BAN ĐẦU (xem minimumMonthlyPayment),
+ *    KHÔNG tính lại theo dư nợ còn lại (tránh hạ thấp khoản tối thiểu thực tế).
+ */
+export function toDebtForSim(d: DebtInput): DebtForSim {
+  return {
+    id: d.id,
+    name: d.name,
+    balance: Math.max(d.principal - d.paidPrincipal, 0),
+    annualRate: d.annualRate,
+    minPayment: minimumMonthlyPayment(d.principal, d.annualRate, d.termMonths),
+  };
+}
