@@ -32,6 +32,7 @@
 - Liên kết Trip ↔ Giao dịch cá nhân: đánh dấu "Tôi" (`isSelf`); ứng tiền chi phí → giao dịch chi (nhiều nguồn); tổng kết → giao dịch thu/chi + ghi nhận đã thanh toán (`TripSettlement`).
 - Nhắc nợ/mục tiêu đến hạn qua **email** (SMTP/nodemailer): `User.email` + trang Cài đặt + cron `/api/reminders/email`.
 - Nhắc qua **Web Push** (service worker + VAPID, `web-push`): `PushSubscription` + bật/tắt theo thiết bị + cron `/api/reminders/push`.
+- Lint (ESLint flat config `next/core-web-vitals` + TS) chạy sạch; hạ tầng test UI (vitest + jsdom + Testing Library) + test mẫu ThemeToggle.
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
@@ -50,4 +51,3 @@
 - **Đăng nhập chưa có mật khẩu** (chỉ username) — cần cắm Keycloak/OIDC + trang quản lý user (xem Later).
 - Docker image **đã build end-to-end pass** (đã thêm `public/.gitkeep`); chưa verify chạy container + kết nối Postgres thực tế.
 - **`recharts`** — đã dùng cho biểu đồ dòng tiền (Báo cáo); có thể mở rộng cho Net Worth/giá theo thời gian.
-- **Chưa có lint config tùy chỉnh / test cho UI** (chỉ test công thức `lib/`).

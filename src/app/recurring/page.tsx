@@ -41,7 +41,7 @@ export default async function RecurringPage() {
         </form>
       </div>
       <p className="text-sm text-gray-500 dark:text-gray-400">
-        Tự sinh giao dịch theo lịch (lương, tiền nhà, subscription...). Bấm "Chạy ngay" hoặc gọi cron
+        Tự sinh giao dịch theo lịch (lương, tiền nhà, subscription...). Bấm &quot;Chạy ngay&quot; hoặc gọi cron
         <code className="mx-1 rounded bg-black/5 dark:bg-white/10 px-1">/api/recurring/run</code>để sinh các kỳ tới hạn.
       </p>
 

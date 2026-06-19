@@ -171,7 +171,7 @@ export function simulatePayoff(
   strategy: PayoffStrategy,
   maxMonths = 1200,
 ): PayoffResult {
-  let remaining = debts.map((d) => ({ ...d }));
+  const remaining = debts.map((d) => ({ ...d }));
   let totalInterest = 0;
   let totalPaid = 0;
   let months = 0;

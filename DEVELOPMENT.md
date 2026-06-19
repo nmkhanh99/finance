@@ -59,7 +59,7 @@ Dockerfile, docker-compose.yml, .dockerignore, .env.example, DOCKER.md
 - **Next.js 15.5.19** (App Router) + **React 19** + **TypeScript 5**.
 - **Tailwind CSS v4** (`@tailwindcss/postcss`).
 - **Prisma 6** + **PostgreSQL**.
-- **Vitest 2** (test công thức).
+- **Vitest 4** (test công thức `lib/` ở node + test UI qua jsdom/Testing Library) + **ESLint 9** (flat config).
 - **Docker / Docker Compose** (xem `DOCKER.md`).
 
 ## 4. Chạy app local (không Docker)
@@ -75,12 +75,12 @@ Chạy bằng Docker: xem `DOCKER.md` (`docker compose up -d --build`).
 
 ## 5. Test / lint / build
 ```bash
-npm run test        # vitest (công thức finance.ts + split.ts)
+npm run test        # vitest: .test.ts (node, công thức lib/) + .test.tsx (jsdom, UI)
 npm run build       # next build (kèm typecheck toàn bộ)
-npm run lint        # next lint
+npm run lint        # eslint . (flat config next/core-web-vitals + typescript)
 npm run db:studio   # Prisma Studio xem dữ liệu
 ```
-Quy ước: **viết test cho công thức tài chính trước khi làm UI**. Mỗi tính năng verify end-to-end (chèn dữ liệu → so số hiển thị với tính tay).
+Quy ước: **viết test cho công thức tài chính trước khi làm UI**. Test UI dùng Testing Library — file `*.test.tsx` cần dòng `// @vitest-environment jsdom` ở đầu (xem `ThemeToggle.test.tsx`); setup chung ở `src/test/setup.ts`. Mỗi tính năng verify end-to-end (chèn dữ liệu → so số hiển thị với tính tay).
 
 ## 6. Quy ước code
 - Tiền **luôn lưu bằng `Decimal`** (Prisma `@db.Decimal`), **không dùng `float`**. Khi tính trong `lib/` thì `Number()` hóa rồi làm tròn về đồng (`round2` / `Math.round`).

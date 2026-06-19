@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
-import { formatMoney, formatDate } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { unrealizedPnL } from "@/lib/finance";
 import { convertToBase } from "@/lib/currency";
 import { requireUserId } from "@/lib/currentUser";
@@ -257,7 +257,7 @@ export default async function InvestmentsPage({
             <PriceChart data={pricePoints} symbol={selected.symbol} />
           ) : (
             <p className="rounded-xl border border-dashed border-black/15 dark:border-white/15 p-5 text-center text-sm text-gray-500 dark:text-gray-400">
-              {selected.symbol}: chưa đủ dữ liệu giá. Bấm "↻ Cập nhật giá" hoặc nhập giá thủ công nhiều lần để vẽ biểu đồ.
+              {selected.symbol}: chưa đủ dữ liệu giá. Bấm &quot;↻ Cập nhật giá&quot; hoặc nhập giá thủ công nhiều lần để vẽ biểu đồ.
             </p>
           )}
         </section>
