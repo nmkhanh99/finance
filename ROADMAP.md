@@ -50,4 +50,3 @@
 ## Technical Debt
 - **Đăng nhập chưa có mật khẩu** (chỉ username) — cần cắm Keycloak/OIDC + trang quản lý user (xem Later).
 - Docker image **đã build end-to-end pass** (đã thêm `public/.gitkeep`); chưa verify chạy container + kết nối Postgres thực tế.
-- **`recharts`** — đã dùng cho biểu đồ dòng tiền (Báo cáo); có thể mở rộng cho Net Worth/giá theo thời gian.
