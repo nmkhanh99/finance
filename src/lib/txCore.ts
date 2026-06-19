@@ -21,7 +21,7 @@ export async function applyTransaction(tx: Prisma.TransactionClient, d: NewTrans
   const amt = d.amount instanceof Prisma.Decimal ? d.amount : new Prisma.Decimal(d.amount);
   const isTransfer = d.type === "TRANSFER";
 
-  await tx.transaction.create({
+  const created = await tx.transaction.create({
     data: {
       type: d.type,
       amount: amt,
@@ -45,4 +45,6 @@ export async function applyTransaction(tx: Prisma.TransactionClient, d: NewTrans
       await tx.account.update({ where: { id: d.toAccountId }, data: { balance: { increment: amt } } });
     }
   }
+
+  return created;
 }

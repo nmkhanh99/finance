@@ -230,12 +230,13 @@ model Goal {
 // ----- Chia tiền nhóm (đi chơi) — độc lập với tài chính cá nhân -----
 
 model TripGroup {
-  id        String        @id @default(cuid())
-  name      String
-  note      String?
-  createdAt DateTime      @default(now())
-  members   TripMember[]
-  expenses  TripExpense[]
+  id          String           @id @default(cuid())
+  name        String
+  note        String?
+  createdAt   DateTime         @default(now())
+  members     TripMember[]
+  expenses    TripExpense[]
+  settlements TripSettlement[]
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
@@ -253,6 +254,8 @@ model TripMember {
 
   paidExpenses TripExpense[]      @relation("ExpensePayer")
   shares       TripExpenseShare[]
+  settleFrom   TripSettlement[]   @relation("SettleFrom")
+  settleTo     TripSettlement[]   @relation("SettleTo")
 
   @@index([groupId])
 }
@@ -277,6 +280,24 @@ model TripExpense {
 
   shares             TripExpenseShare[]
   linkedTransactions Transaction[] // giao dịch cá nhân sinh ra khi bạn ứng tiền
+
+  @@index([groupId])
+}
+
+// Ghi nhận 1 lần thanh toán giữa 2 thành viên (tất toán bớt số dư). Tính bằng VND.
+// Nếu liên quan tới "bạn" (self) có thể kèm giao dịch cá nhân (transactionId).
+model TripSettlement {
+  id            String     @id @default(cuid())
+  group         TripGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId       String
+  fromMember    TripMember @relation("SettleFrom", fields: [fromMemberId], references: [id], onDelete: Cascade)
+  fromMemberId  String
+  toMember      TripMember @relation("SettleTo", fields: [toMemberId], references: [id], onDelete: Cascade)
+  toMemberId    String
+  amount        Decimal    @db.Decimal(18, 2) // VND
+  date          DateTime
+  transactionId String? // giao dịch cá nhân liên kết (nếu có)
+  createdAt     DateTime   @default(now())
 
   @@index([groupId])
 }

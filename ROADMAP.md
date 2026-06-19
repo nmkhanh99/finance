@@ -29,6 +29,7 @@
 - Multi-user: đăng nhập bằng username, dữ liệu cách ly theo user (userId mọi bảng cá nhân, chống IDOR); seam `getCurrentUserId()` sẵn cho IdP.
 - Đa tiền tệ cho Chia tiền nhóm (TripExpense.currency, báo cáo quy đổi VND).
 - Mô phỏng trả nợ chính xác hơn: minPayment = khoản góp cố định theo GỐC & kỳ hạn ban đầu (`toDebtForSim`/`minimumMonthlyPayment`), không hạ thấp theo dư nợ còn lại.
+- Liên kết Trip ↔ Giao dịch cá nhân: đánh dấu "Tôi" (`isSelf`); ứng tiền chi phí → giao dịch chi (nhiều nguồn); tổng kết → giao dịch thu/chi + ghi nhận đã thanh toán (`TripSettlement`).
 - Tài liệu: DEVELOPMENT / USER_GUIDE / CHANGELOG / ROADMAP + rule documentation-maintenance.
 
 ## In Progress
@@ -42,7 +43,6 @@
 - Map cột CSV linh hoạt khi import sao kê ngân hàng (định dạng khác nhau giữa ngân hàng).
 - Nhắc lịch trả nợ / đáo hạn (push/email).
 - Mở rộng danh sách mã crypto hỗ trợ / nhập `priceId` tùy chỉnh.
-- Ghi phần chi của "tôi" trong nhóm vào Giao dịch cá nhân (liên kết Trip ↔ tài chính cá nhân).
 
 ## Technical Debt
 - **Date dùng `timestamp` không-timezone** (lệch +7h) — cân nhắc đổi sang `@db.Date` cho các trường ngày.

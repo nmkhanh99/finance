@@ -6,7 +6,15 @@ import { formatMoney, formatDate } from "@/lib/format";
 import { settle, type Balance } from "@/lib/split";
 import { loadRates } from "@/lib/rates";
 import { convertToBase } from "@/lib/currency";
-import { addMember, deleteMember, deleteExpense, deleteGroup, setSelfMember } from "../actions";
+import {
+  addMember,
+  deleteMember,
+  deleteExpense,
+  deleteGroup,
+  setSelfMember,
+  recordSettlement,
+  deleteSettlement,
+} from "../actions";
 import ExpenseForm from "./ExpenseForm";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +34,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           linkedTransactions: { select: { id: true } },
         },
       },
+      settlements: { orderBy: { date: "desc" } },
     },
   });
   if (!group) notFound();
@@ -53,12 +62,21 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       owed.set(s.memberId, (owed.get(s.memberId) ?? 0) + convertToBase(Number(s.amount), e.currency, rates));
     }
   }
+  // Các khoản đã ghi nhận thanh toán: from đã trả -> net tăng; to đã nhận -> net giảm.
+  const settleAdj = new Map<string, number>();
+  for (const st of group.settlements) {
+    const a = Number(st.amount);
+    settleAdj.set(st.fromMemberId, (settleAdj.get(st.fromMemberId) ?? 0) + a);
+    settleAdj.set(st.toMemberId, (settleAdj.get(st.toMemberId) ?? 0) - a);
+  }
   const balances: Balance[] = group.members.map((m) => {
     const p = paid.get(m.id) ?? 0;
     const o = owed.get(m.id) ?? 0;
-    return { id: m.id, name: m.name, paid: p, owed: o, net: p - o };
+    return { id: m.id, name: m.name, paid: p, owed: o, net: p - o + (settleAdj.get(m.id) ?? 0) };
   });
   const transfers = settle(balances);
+  const selfId = selfMember?.id ?? null;
+  const nameById = new Map(group.members.map((m) => [m.id, m.name]));
 
   return (
     <div className="space-y-8">
@@ -198,23 +216,64 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
           </div>
           <p className="text-xs text-gray-600 dark:text-gray-500">Số tiền đã quy đổi về VND theo tỷ giá. Chênh lệch dương: nhóm nợ bạn. Âm: bạn cần trả lại nhóm.</p>
 
-          {/* Phương án thanh toán */}
+          {/* Phương án thanh toán — bấm "Ghi nhận" để đánh dấu đã trả & (nếu là bạn) tạo giao dịch */}
           <div className="space-y-2">
             <h3 className="font-medium text-gray-700 dark:text-gray-300">Phương án thanh toán (tối thiểu)</h3>
             {transfers.length === 0 ? (
               <p className="text-sm text-emerald-400">✓ Đã cân bằng, không ai cần chuyển tiền.</p>
             ) : (
-              transfers.map((t, i) => (
-                <div key={i} className="flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 px-4 py-2 text-sm">
-                  <span className="font-medium text-red-400">{t.fromName}</span>
-                  <span className="text-gray-500 dark:text-gray-400">chuyển</span>
-                  <span className="font-semibold">{formatMoney(t.amount)}</span>
-                  <span className="text-gray-500 dark:text-gray-400">cho</span>
-                  <span className="font-medium text-emerald-400">{t.toName}</span>
-                </div>
-              ))
+              transfers.map((t, i) => {
+                const selfReceives = t.toId === selfId;
+                const selfPays = t.fromId === selfId;
+                return (
+                  <form key={i} action={recordSettlement} className="flex flex-wrap items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 px-4 py-2 text-sm">
+                    <input type="hidden" name="groupId" value={group.id} />
+                    <input type="hidden" name="fromMemberId" value={t.fromId} />
+                    <input type="hidden" name="toMemberId" value={t.toId} />
+                    <input type="hidden" name="amount" value={Math.round(t.amount)} />
+                    <span className="font-medium text-red-400">{t.fromName}</span>
+                    <span className="text-gray-500 dark:text-gray-400">chuyển</span>
+                    <span className="font-semibold">{formatMoney(t.amount)}</span>
+                    <span className="text-gray-500 dark:text-gray-400">cho</span>
+                    <span className="font-medium text-emerald-400">{t.toName}</span>
+                    {(selfReceives || selfPays) && accounts.length > 0 && (
+                      <select name="accountId" defaultValue="" className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-2 py-1 text-xs">
+                        <option value="">{selfReceives ? "Nhận vào… (tùy chọn)" : "Trả từ… (tùy chọn)"}</option>
+                        {accounts.map((a) => (
+                          <option key={a.id} value={a.id}>{a.name} ({a.currency})</option>
+                        ))}
+                      </select>
+                    )}
+                    <button className="ml-auto rounded-lg border border-emerald-500/40 px-2 py-1 text-xs text-emerald-400 hover:bg-emerald-500/10">
+                      {selfReceives ? "Đã nhận ✓" : selfPays ? "Đã trả ✓" : "Đã thanh toán ✓"}
+                    </button>
+                  </form>
+                );
+              })
             )}
           </div>
+
+          {/* Lịch sử đã ghi nhận thanh toán */}
+          {group.settlements.length > 0 && (
+            <div className="space-y-2">
+              <h3 className="font-medium text-gray-700 dark:text-gray-300">Đã ghi nhận thanh toán</h3>
+              {group.settlements.map((s) => (
+                <div key={s.id} className="flex flex-wrap items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 px-4 py-2 text-sm">
+                  <span className="text-gray-500 dark:text-gray-400">{formatDate(s.date)}</span>
+                  <span className="font-medium">{nameById.get(s.fromMemberId) ?? "?"}</span>
+                  <span className="text-gray-500 dark:text-gray-400">→</span>
+                  <span className="font-medium">{nameById.get(s.toMemberId) ?? "?"}</span>
+                  <span className="font-semibold">{formatMoney(Number(s.amount))}</span>
+                  {s.transactionId && <span className="rounded bg-emerald-500/15 px-1.5 text-xs text-emerald-400">đã tạo giao dịch</span>}
+                  <form action={deleteSettlement} className="ml-auto">
+                    <input type="hidden" name="id" value={s.id} />
+                    <input type="hidden" name="groupId" value={group.id} />
+                    <button className="rounded-lg border border-red-500/30 px-2 py-1 text-xs text-red-400 hover:bg-red-500/10">Hoàn tác</button>
+                  </form>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
     </div>

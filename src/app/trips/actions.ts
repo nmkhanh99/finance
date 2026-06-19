@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { Prisma, SplitType } from "@prisma/client";
 import { equalSplit } from "@/lib/split";
 import { applyTransaction } from "@/lib/txCore";
+import { loadRates } from "@/lib/rates";
 import { requireUserId } from "@/lib/currentUser";
 
 export async function createGroup(formData: FormData) {
@@ -198,4 +199,102 @@ export async function deleteExpense(formData: FormData) {
     revalidatePath("/transactions");
     revalidatePath("/");
   }
+}
+
+/**
+ * Ghi nhận 1 lần thanh toán giữa 2 thành viên (số tiền VND) khi tổng kết.
+ * Nếu chọn tài khoản VÀ "bạn" (self) là 1 trong 2 phía -> tạo giao dịch cá nhân
+ * (bạn là người NHẬN -> thu; bạn là người TRẢ -> chi) và link vào bản ghi.
+ */
+export async function recordSettlement(formData: FormData) {
+  const userId = await requireUserId();
+  const groupId = String(formData.get("groupId") ?? "");
+  const fromMemberId = String(formData.get("fromMemberId") ?? "");
+  const toMemberId = String(formData.get("toMemberId") ?? "");
+  const amountVnd = Math.round(Math.max(Number(formData.get("amount") ?? 0) || 0, 0));
+  const accountId = String(formData.get("accountId") ?? "") || null;
+  const dateStr = String(formData.get("date") ?? "");
+  if (!groupId || !fromMemberId || !toMemberId || fromMemberId === toMemberId || amountVnd <= 0) return;
+
+  const group = await prisma.tripGroup.findFirst({
+    where: { id: groupId, userId },
+    include: { members: { select: { id: true, name: true, isSelf: true } } },
+  });
+  if (!group) return;
+  const memberById = new Map(group.members.map((m) => [m.id, m]));
+  const from = memberById.get(fromMemberId);
+  const to = memberById.get(toMemberId);
+  if (!from || !to) return;
+
+  const date = dateStr ? new Date(dateStr) : new Date();
+
+  // Tài khoản (nếu chọn) phải thuộc user; chỉ tạo giao dịch khi "bạn" là 1 trong 2 phía.
+  let account: { id: string; currency: string } | null = null;
+  if (accountId) {
+    account = await prisma.account.findFirst({ where: { id: accountId, userId }, select: { id: true, currency: true } });
+  }
+  const selfIsReceiver = to.isSelf; // bạn nhận tiền -> INCOME
+  const selfIsPayer = from.isSelf; // bạn trả tiền -> EXPENSE
+  const willCreateTx = !!account && (selfIsReceiver || selfIsPayer);
+
+  // Quy đổi VND -> tiền tệ của tài khoản nhận/chi (rate = số VND cho 1 đơn vị).
+  let rates: Record<string, number> = {};
+  if (willCreateTx && account && account.currency !== "VND") rates = await loadRates();
+
+  await prisma.$transaction(async (tx) => {
+    let transactionId: string | null = null;
+    if (willCreateTx && account) {
+      const r = account.currency === "VND" ? 1 : rates[account.currency] || 0;
+      const acctAmount = r > 0 ? Math.round((amountVnd / r) * 100) / 100 : amountVnd;
+      const created = await applyTransaction(tx, {
+        type: selfIsReceiver ? "INCOME" : "EXPENSE",
+        amount: acctAmount,
+        date,
+        note: selfIsReceiver
+          ? `Trip: ${group.name} · nhận từ ${from.name}`
+          : `Trip: ${group.name} · trả ${to.name}`,
+        accountId: account.id,
+        categoryId: null,
+        userId,
+      });
+      transactionId = created.id;
+    }
+    await tx.tripSettlement.create({
+      data: { groupId, fromMemberId, toMemberId, amount: new Prisma.Decimal(amountVnd), date, transactionId },
+    });
+  });
+  revalidatePath(`/trips/${groupId}`);
+  if (willCreateTx) {
+    revalidatePath("/accounts");
+    revalidatePath("/transactions");
+    revalidatePath("/");
+  }
+}
+
+export async function deleteSettlement(formData: FormData) {
+  const userId = await requireUserId();
+  const id = String(formData.get("id") ?? "");
+  const groupId = String(formData.get("groupId") ?? "");
+  if (!id) return;
+  const s = await prisma.tripSettlement.findFirst({ where: { id, group: { userId } } });
+  if (!s) return;
+  await prisma.$transaction(async (tx) => {
+    if (s.transactionId) {
+      const t = await tx.transaction.findUnique({ where: { id: s.transactionId } });
+      if (t) {
+        // Hoàn số dư: INCOME -> trừ lại; EXPENSE -> cộng lại. Rồi xoá giao dịch.
+        if (t.type === "INCOME") {
+          await tx.account.update({ where: { id: t.accountId }, data: { balance: { decrement: t.amount } } });
+        } else {
+          await tx.account.update({ where: { id: t.accountId }, data: { balance: { increment: t.amount } } });
+        }
+        await tx.transaction.delete({ where: { id: t.id } });
+      }
+    }
+    await tx.tripSettlement.delete({ where: { id } });
+  });
+  revalidatePath(`/trips/${groupId}`);
+  revalidatePath("/accounts");
+  revalidatePath("/transactions");
+  revalidatePath("/");
 }
