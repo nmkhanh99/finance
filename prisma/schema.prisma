@@ -119,9 +119,14 @@ model Transaction {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
+  // Liên kết với khoản chi nhóm đã ứng tiền (nếu giao dịch sinh ra từ Trip).
+  tripExpense   TripExpense? @relation(fields: [tripExpenseId], references: [id], onDelete: SetNull)
+  tripExpenseId String?
+
   @@index([date])
   @@index([accountId])
   @@index([userId])
+  @@index([tripExpenseId])
 }
 
 // ----- Đầu tư -----
@@ -243,6 +248,7 @@ model TripMember {
   group     TripGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId   String
   name      String
+  isSelf    Boolean   @default(false) // thành viên này là chủ tài khoản (bạn) — tối đa 1/nhóm
   createdAt DateTime  @default(now())
 
   paidExpenses TripExpense[]      @relation("ExpensePayer")
@@ -269,7 +275,8 @@ model TripExpense {
   payerId     String
   createdAt   DateTime   @default(now())
 
-  shares TripExpenseShare[]
+  shares             TripExpenseShare[]
+  linkedTransactions Transaction[] // giao dịch cá nhân sinh ra khi bạn ứng tiền
 
   @@index([groupId])
 }

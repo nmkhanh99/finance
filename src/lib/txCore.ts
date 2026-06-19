@@ -9,6 +9,7 @@ export interface NewTransaction {
   toAccountId?: string | null;
   categoryId?: string | null;
   userId: string;
+  tripExpenseId?: string | null;
 }
 
 /**
@@ -30,6 +31,7 @@ export async function applyTransaction(tx: Prisma.TransactionClient, d: NewTrans
       toAccountId: isTransfer ? d.toAccountId ?? null : null,
       categoryId: isTransfer ? null : d.categoryId ?? null,
       userId: d.userId,
+      tripExpenseId: d.tripExpenseId ?? null,
     },
   });
 

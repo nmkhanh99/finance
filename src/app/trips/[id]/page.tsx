@@ -6,7 +6,7 @@ import { formatMoney, formatDate } from "@/lib/format";
 import { settle, type Balance } from "@/lib/split";
 import { loadRates } from "@/lib/rates";
 import { convertToBase } from "@/lib/currency";
-import { addMember, deleteMember, deleteExpense, deleteGroup } from "../actions";
+import { addMember, deleteMember, deleteExpense, deleteGroup, setSelfMember } from "../actions";
 import ExpenseForm from "./ExpenseForm";
 
 export const dynamic = "force-dynamic";
@@ -20,11 +20,19 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       members: { orderBy: { createdAt: "asc" } },
       expenses: {
         orderBy: { date: "desc" },
-        include: { payer: true, shares: { include: { member: true } } },
+        include: {
+          payer: true,
+          shares: { include: { member: true } },
+          linkedTransactions: { select: { id: true } },
+        },
       },
     },
   });
   if (!group) notFound();
+
+  // Tài khoản của bạn — để chọn nguồn trả khi tự ứng tiền cho chi phí nhóm.
+  const accounts = await prisma.account.findMany({ where: { userId }, orderBy: { name: "asc" } });
+  const selfMember = group.members.find((m) => m.isSelf) ?? null;
 
   // Báo cáo cân bằng & thanh toán tính bằng VND (quy đổi mỗi khoản theo tiền tệ của nó).
   const rates = await loadRates();
@@ -74,8 +82,19 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
         <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300">Thành viên</h2>
         <div className="flex flex-wrap gap-2">
           {group.members.map((m) => (
-            <span key={m.id} className="flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 px-3 py-1 text-sm">
+            <span
+              key={m.id}
+              className={`flex items-center gap-2 rounded-full border px-3 py-1 text-sm ${m.isSelf ? "border-emerald-500/40 bg-emerald-500/10" : "border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5"}`}
+            >
               {m.name}
+              {m.isSelf && <span className="rounded-full bg-emerald-500/20 px-1.5 text-xs text-emerald-400">Tôi</span>}
+              <form action={setSelfMember}>
+                <input type="hidden" name="memberId" value={m.id} />
+                <input type="hidden" name="groupId" value={group.id} />
+                <button className="text-xs text-gray-500 hover:text-emerald-400 dark:text-gray-400" title={m.isSelf ? "Bỏ đánh dấu là tôi" : "Đánh dấu thành viên này là tôi"}>
+                  {m.isSelf ? "★" : "☆"}
+                </button>
+              </form>
               <form action={deleteMember}>
                 <input type="hidden" name="id" value={m.id} />
                 <input type="hidden" name="groupId" value={group.id} />
@@ -84,6 +103,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
             </span>
           ))}
         </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400">Bấm ☆ để đánh dấu thành viên là <b>bạn</b> — khi bạn ứng tiền cho 1 khoản, có thể trừ thẳng vào tài khoản cá nhân.</p>
         <form action={addMember} className="flex items-end gap-2">
           <input type="hidden" name="groupId" value={group.id} />
           <input name="name" required placeholder="Tên thành viên" className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2 text-sm" />
@@ -95,7 +115,12 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
       {group.members.length >= 1 ? (
         <section className="space-y-3">
           <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300">Thêm chi phí</h2>
-          <ExpenseForm groupId={group.id} members={group.members} />
+          <ExpenseForm
+            groupId={group.id}
+            members={group.members}
+            accounts={accounts.map((a) => ({ id: a.id, name: a.name, currency: a.currency }))}
+            selfMemberId={selfMember?.id ?? null}
+          />
         </section>
       ) : (
         <p className="text-sm text-gray-500 dark:text-gray-400">Thêm ít nhất 1 thành viên để bắt đầu ghi chi phí.</p>
@@ -114,6 +139,11 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
                     {formatDate(e.date)} · <span className="text-sky-400">{e.payer.name}</span> trả ·
                     chia cho {e.shares.map((s) => s.member.name).join(", ")}
                     {e.splitType === "CUSTOM" ? " (tùy chỉnh)" : ""}
+                    {e.linkedTransactions.length > 0 && (
+                      <span className="ml-1 rounded bg-emerald-500/15 px-1.5 text-emerald-400">
+                        đã trừ {e.linkedTransactions.length} tài khoản
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

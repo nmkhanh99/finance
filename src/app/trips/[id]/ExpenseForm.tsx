@@ -8,11 +8,32 @@ interface Member {
   name: string;
 }
 
-export default function ExpenseForm({ groupId, members }: { groupId: string; members: Member[] }) {
+interface Account {
+  id: string;
+  name: string;
+  currency: string;
+}
+
+export default function ExpenseForm({
+  groupId,
+  members,
+  accounts,
+  selfMemberId,
+}: {
+  groupId: string;
+  members: Member[];
+  accounts: Account[];
+  selfMemberId: string | null;
+}) {
   const [mode, setMode] = useState<"EQUAL" | "CUSTOM">("EQUAL");
   const [currency, setCurrency] = useState("VND");
+  const [payerId, setPayerId] = useState(members[0]?.id ?? "");
   const [selected, setSelected] = useState<Set<string>>(new Set(members.map((m) => m.id)));
+  const [payRows, setPayRows] = useState<{ accountId: string; amount: string }[]>([{ accountId: "", amount: "" }]);
   const cur = currency.trim().toUpperCase() || "VND";
+
+  // Chỉ cho ghi giao dịch khi người trả là "bạn" và đã có tài khoản.
+  const showPay = selfMemberId !== null && payerId === selfMemberId && accounts.length > 0;
 
   function toggle(id: string) {
     setSelected((prev) => {
@@ -21,6 +42,10 @@ export default function ExpenseForm({ groupId, members }: { groupId: string; mem
       else next.add(id);
       return next;
     });
+  }
+
+  function setRow(i: number, patch: Partial<{ accountId: string; amount: string }>) {
+    setPayRows((rows) => rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
   }
 
   return (
@@ -38,9 +63,15 @@ export default function ExpenseForm({ groupId, members }: { groupId: string; mem
 
       <label className="flex flex-col text-sm">
         <span className="mb-1 text-gray-500 dark:text-gray-400">Người trả</span>
-        <select name="payerId" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2">
+        <select
+          name="payerId"
+          required
+          value={payerId}
+          onChange={(e) => setPayerId(e.target.value)}
+          className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2"
+        >
           {members.map((m) => (
-            <option key={m.id} value={m.id}>{m.name}</option>
+            <option key={m.id} value={m.id}>{m.name}{m.id === selfMemberId ? " (Tôi)" : ""}</option>
           ))}
         </select>
       </label>
@@ -127,6 +158,51 @@ export default function ExpenseForm({ groupId, members }: { groupId: string; mem
           })}
         </div>
       </div>
+
+      {/* Bạn ứng tiền -> trừ vào (nhiều) tài khoản cá nhân (tùy chọn) */}
+      {showPay && (
+        <div className="sm:col-span-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3">
+          <div className="mb-2 text-sm font-medium text-emerald-400">Bạn ứng tiền — trừ vào tài khoản (tùy chọn)</div>
+          <div className="space-y-2">
+            {payRows.map((row, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <select
+                  name="payAccountId"
+                  value={row.accountId}
+                  onChange={(e) => setRow(i, { accountId: e.target.value })}
+                  className="flex-1 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2 text-sm"
+                >
+                  <option value="">— Chọn tài khoản —</option>
+                  {accounts.map((a) => (
+                    <option key={a.id} value={a.id}>{a.name} ({a.currency})</option>
+                  ))}
+                </select>
+                <input
+                  name="payAmount"
+                  type="number"
+                  step="1000"
+                  min="0"
+                  value={row.amount}
+                  onChange={(e) => setRow(i, { amount: e.target.value })}
+                  placeholder="Số tiền"
+                  className="w-32 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2 text-right text-sm"
+                />
+                {payRows.length > 1 && (
+                  <button type="button" onClick={() => setPayRows((r) => r.filter((_, idx) => idx !== i))} className="text-red-400 hover:text-red-300" title="Bỏ dòng">×</button>
+                )}
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setPayRows((r) => [...r, { accountId: "", amount: "" }])}
+            className="mt-2 rounded-lg border border-black/15 dark:border-white/15 px-3 py-1 text-xs hover:bg-black/5 dark:hover:bg-white/10"
+          >
+            + Thêm nguồn trả
+          </button>
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Số tiền theo tiền tệ của từng tài khoản. Mỗi dòng tạo 1 giao dịch chi, trừ vào số dư. Để trống nếu không muốn ghi giao dịch.</p>
+        </div>
+      )}
 
       <button className="rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black hover:bg-emerald-400 sm:col-span-2">
         + Thêm chi phí
