@@ -156,7 +156,7 @@ model Holding {
   symbol    String // VD: VNM, BTC
   assetType AssetType
   quantity  Decimal   @db.Decimal(28, 8) // crypto có phần lẻ lớn
-  avgCost   Decimal   @db.Decimal(18, 8) // giá vốn trung bình / đơn vị
+  avgCost   Decimal   @db.Decimal(24, 8) // giá vốn trung bình / đơn vị
   currency  String    @default("VND")
   note      String?
   createdAt DateTime  @default(now())
@@ -175,7 +175,7 @@ model PriceSnapshot {
   id        String   @id @default(cuid())
   holding   Holding  @relation(fields: [holdingId], references: [id], onDelete: Cascade)
   holdingId String
-  price     Decimal  @db.Decimal(18, 8)
+  price     Decimal  @db.Decimal(24, 8)
   at        DateTime @default(now())
 
   @@index([holdingId, at])

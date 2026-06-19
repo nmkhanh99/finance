@@ -48,7 +48,6 @@
 ## Technical Debt
 - **Date dùng `timestamp` không-timezone** (lệch +7h) — cân nhắc đổi sang `@db.Date` cho các trường ngày.
 - **Đăng nhập chưa có mật khẩu** (chỉ username) — cần cắm Keycloak/OIDC + trang quản lý user (xem Later).
-- **Cột giá `Decimal(18,8)`** — đủ cho BTC theo VND hiện tại nhưng cần nới nếu giá/đơn vị vượt ~10 tỷ.
 - Docker image **đã build end-to-end pass** (đã thêm `public/.gitkeep`); chưa verify chạy container + kết nối Postgres thực tế.
 - **`recharts`** — đã dùng cho biểu đồ dòng tiền (Báo cáo); có thể mở rộng cho Net Worth/giá theo thời gian.
 - **Chưa có lint config tùy chỉnh / test cho UI** (chỉ test công thức `lib/`).
