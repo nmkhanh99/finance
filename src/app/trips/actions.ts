@@ -5,37 +5,46 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Prisma, SplitType } from "@prisma/client";
 import { equalSplit } from "@/lib/split";
+import { requireUserId } from "@/lib/currentUser";
 
 export async function createGroup(formData: FormData) {
+  const userId = await requireUserId();
   const name = String(formData.get("name") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim() || null;
   if (!name) return;
-  const g = await prisma.tripGroup.create({ data: { name, note } });
+  const g = await prisma.tripGroup.create({ data: { userId, name, note } });
   redirect(`/trips/${g.id}`);
 }
 
 export async function deleteGroup(formData: FormData) {
+  const userId = await requireUserId();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
-  await prisma.tripGroup.delete({ where: { id } });
+  await prisma.tripGroup.deleteMany({ where: { id, userId } });
   revalidatePath("/trips");
   redirect("/trips");
 }
 
 export async function addMember(formData: FormData) {
+  const userId = await requireUserId();
   const groupId = String(formData.get("groupId") ?? "");
   const name = String(formData.get("name") ?? "").trim();
   if (!groupId || !name) return;
+  // Xác minh group thuộc user trước khi thêm thành viên (chống IDOR)
+  const group = await prisma.tripGroup.findFirst({ where: { id: groupId, userId } });
+  if (!group) return;
   await prisma.tripMember.create({ data: { groupId, name } });
   revalidatePath(`/trips/${groupId}`);
 }
 
 export async function deleteMember(formData: FormData) {
+  const userId = await requireUserId();
   const id = String(formData.get("id") ?? "");
   const groupId = String(formData.get("groupId") ?? "");
   if (!id) return;
   try {
-    await prisma.tripMember.delete({ where: { id } });
+    // Chỉ xoá member nếu group cha thuộc user hiện tại
+    await prisma.tripMember.deleteMany({ where: { id, group: { userId } } });
   } catch {
     // Không xoá được nếu thành viên đã trả/đứng tên trong chi phí -> bỏ qua
   }
@@ -43,6 +52,7 @@ export async function deleteMember(formData: FormData) {
 }
 
 export async function addExpense(formData: FormData) {
+  const userId = await requireUserId();
   const groupId = String(formData.get("groupId") ?? "");
   const description = String(formData.get("description") ?? "").trim();
   const payerId = String(formData.get("payerId") ?? "");
@@ -51,6 +61,16 @@ export async function addExpense(formData: FormData) {
   const participantIds = formData.getAll("participants").map(String).filter(Boolean);
 
   if (!groupId || !description || !payerId || participantIds.length === 0) return;
+
+  // Xác minh group thuộc user; payer + participants phải là thành viên của group (chống IDOR)
+  const group = await prisma.tripGroup.findFirst({
+    where: { id: groupId, userId },
+    include: { members: { select: { id: true } } },
+  });
+  if (!group) return;
+  const memberIds = new Set(group.members.map((m) => m.id));
+  if (!memberIds.has(payerId)) return;
+  if (!participantIds.every((id) => memberIds.has(id))) return;
 
   // Tính số tiền mỗi người phải chịu
   let shares: { memberId: string; amount: number }[];
@@ -90,9 +110,11 @@ export async function addExpense(formData: FormData) {
 }
 
 export async function deleteExpense(formData: FormData) {
+  const userId = await requireUserId();
   const id = String(formData.get("id") ?? "");
   const groupId = String(formData.get("groupId") ?? "");
   if (!id) return;
-  await prisma.tripExpense.delete({ where: { id } });
+  // Chỉ xoá expense nếu group cha thuộc user hiện tại
+  await prisma.tripExpense.deleteMany({ where: { id, group: { userId } } });
   revalidatePath(`/trips/${groupId}`);
 }

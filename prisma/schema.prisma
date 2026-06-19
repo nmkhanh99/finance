@@ -10,6 +10,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ----- Người dùng (multi-user) -----
+// Đăng nhập bằng username (chưa có mật khẩu). `externalId` để map sau với IdP
+// (vd Keycloak `sub`) khi bật bảo mật — không phải đổi schema dữ liệu.
+model User {
+  id         String   @id @default(cuid())
+  username   String   @unique
+  externalId String?  @unique
+  createdAt  DateTime @default(now())
+
+  accounts      Account[]
+  categories    Category[]
+  transactions  Transaction[]
+  budgets       Budget[]
+  holdings      Holding[]
+  debts         Debt[]
+  goals         Goal[]
+  recurrings    RecurringTransaction[]
+  netWorthSnaps NetWorthSnapshot[]
+  tripGroups    TripGroup[]
+}
+
 // ----- Tài khoản & dòng tiền -----
 
 enum AccountType {
@@ -27,15 +48,20 @@ model Account {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
-  transactions     Transaction[] @relation("AccountTx")
-  transfersFrom    Transaction[] @relation("FromAccount")
-  recurring        RecurringTransaction[] @relation("RecurringAccount")
-  recurringTo      RecurringTransaction[] @relation("RecurringToAccount")
+  transactions  Transaction[]          @relation("AccountTx")
+  transfersFrom Transaction[]          @relation("FromAccount")
+  recurring     RecurringTransaction[] @relation("RecurringAccount")
+  recurringTo   RecurringTransaction[] @relation("RecurringToAccount")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId])
 }
 
 enum TransactionType {
-  INCOME   // thu
-  EXPENSE  // chi
+  INCOME // thu
+  EXPENSE // chi
   TRANSFER // chuyển giữa các tài khoản
 }
 
@@ -49,6 +75,11 @@ model Category {
   transactions Transaction[]
   budget       Budget?
   recurrings   RecurringTransaction[]
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId])
 }
 
 // Hạn mức chi tiêu hằng tháng cho 1 danh mục (lặp lại mỗi tháng)
@@ -60,18 +91,23 @@ model Budget {
   currency    String   @default("VND")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId])
 }
 
 model Transaction {
-  id         String          @id @default(cuid())
-  type       TransactionType
-  amount     Decimal         @db.Decimal(18, 2)
-  date       DateTime // ngày phát sinh
-  note       String?
-  createdAt  DateTime        @default(now())
+  id        String          @id @default(cuid())
+  type      TransactionType
+  amount    Decimal         @db.Decimal(18, 2)
+  date      DateTime // ngày phát sinh
+  note      String?
+  createdAt DateTime        @default(now())
 
-  account    Account  @relation("AccountTx", fields: [accountId], references: [id], onDelete: Cascade)
-  accountId  String
+  account   Account @relation("AccountTx", fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String
 
   // chỉ dùng cho TRANSFER: tài khoản nhận
   toAccount   Account? @relation("FromAccount", fields: [toAccountId], references: [id])
@@ -80,14 +116,18 @@ model Transaction {
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?
 
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
   @@index([date])
   @@index([accountId])
+  @@index([userId])
 }
 
 // ----- Đầu tư -----
 
 enum AssetType {
-  STOCK  // chứng khoán
+  STOCK // chứng khoán
   CRYPTO // tiền ảo
 }
 
@@ -104,7 +144,11 @@ model Holding {
 
   prices PriceSnapshot[]
 
-  @@unique([symbol, assetType])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([userId, symbol, assetType])
+  @@index([userId])
 }
 
 model PriceSnapshot {
@@ -120,8 +164,8 @@ model PriceSnapshot {
 // ----- Nợ / Vay -----
 
 enum DebtInterestType {
-  SIMPLE     // lãi đơn
-  COMPOUND   // lãi kép
+  SIMPLE // lãi đơn
+  COMPOUND // lãi kép
   AMORTIZING // trả góp đều (annuity)
 }
 
@@ -139,6 +183,11 @@ model Debt {
   updatedAt    DateTime         @updatedAt
 
   payments DebtPayment[]
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId])
 }
 
 model DebtPayment {
@@ -166,6 +215,11 @@ model Goal {
   note         String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId])
 }
 
 // ----- Chia tiền nhóm (đi chơi) — độc lập với tài chính cá nhân -----
@@ -177,14 +231,19 @@ model TripGroup {
   createdAt DateTime      @default(now())
   members   TripMember[]
   expenses  TripExpense[]
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId])
 }
 
 model TripMember {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   group     TripGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId   String
   name      String
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   paidExpenses TripExpense[]      @relation("ExpensePayer")
   shares       TripExpenseShare[]
@@ -193,21 +252,21 @@ model TripMember {
 }
 
 enum SplitType {
-  EQUAL  // chia đều
+  EQUAL // chia đều
   CUSTOM // tùy chỉnh số tiền mỗi người
 }
 
 model TripExpense {
-  id          String    @id @default(cuid())
-  group       TripGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  id          String     @id @default(cuid())
+  group       TripGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId     String
   description String // nội dung chi phí (bắt buộc)
-  amount      Decimal   @db.Decimal(18, 2)
+  amount      Decimal    @db.Decimal(18, 2)
   date        DateTime
-  splitType   SplitType @default(EQUAL)
+  splitType   SplitType  @default(EQUAL)
   payer       TripMember @relation("ExpensePayer", fields: [payerId], references: [id])
   payerId     String
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime   @default(now())
 
   shares TripExpenseShare[]
 
@@ -246,18 +305,27 @@ model RecurringTransaction {
   active      Boolean             @default(true)
   createdAt   DateTime            @default(now())
 
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
   @@index([active, nextRun])
+  @@index([userId])
 }
 
 // Snapshot tài sản ròng tại 1 thời điểm (1 bản/ngày) để vẽ Net Worth theo thời gian.
 model NetWorthSnapshot {
   id          String   @id @default(cuid())
-  date        DateTime @unique @db.Date // chuẩn hoá theo ngày
+  date        DateTime @db.Date // chuẩn hoá theo ngày
   totalCash   Decimal  @db.Decimal(18, 2)
   totalInvest Decimal  @db.Decimal(18, 2)
   totalDebt   Decimal  @db.Decimal(18, 2)
   netWorth    Decimal  @db.Decimal(18, 2)
   createdAt   DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([userId, date])
 }
 
 // Mỗi dòng = số tiền 1 người phải chịu trong 1 chi phí

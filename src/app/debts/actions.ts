@@ -3,8 +3,10 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { DebtInterestType, Prisma } from "@prisma/client";
+import { requireUserId } from "@/lib/currentUser";
 
 export async function createDebt(formData: FormData) {
+  const userId = await requireUserId();
   const name = String(formData.get("name") ?? "").trim();
   const principal = Number(formData.get("principal") ?? 0);
   const ratePercent = Number(formData.get("ratePercent") ?? 0); // người dùng nhập %/năm
@@ -22,6 +24,7 @@ export async function createDebt(formData: FormData) {
       termMonths,
       startDate: startStr ? new Date(startStr) : new Date(),
       currency: "VND",
+      userId,
     },
   });
   revalidatePath("/debts");
@@ -30,13 +33,15 @@ export async function createDebt(formData: FormData) {
 
 /** Ghi nhận 1 lần trả nợ; tự tách phần lãi (theo dư nợ) và phần gốc. */
 export async function addPayment(formData: FormData) {
+  const userId = await requireUserId();
   const debtId = String(formData.get("debtId") ?? "");
   const amount = Number(formData.get("amount") ?? 0);
   const dateStr = String(formData.get("date") ?? "");
   if (!debtId || amount <= 0) return;
 
-  const debt = await prisma.debt.findUnique({
-    where: { id: debtId },
+  // Xác minh debt thuộc user hiện tại trước khi ghi nhận trả nợ (chống IDOR).
+  const debt = await prisma.debt.findFirst({
+    where: { id: debtId, userId },
     include: { payments: true },
   });
   if (!debt) return;
@@ -62,9 +67,10 @@ export async function addPayment(formData: FormData) {
 }
 
 export async function deleteDebt(formData: FormData) {
+  const userId = await requireUserId();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
-  await prisma.debt.delete({ where: { id } });
+  await prisma.debt.deleteMany({ where: { id, userId } });
   revalidatePath("/debts");
   revalidatePath("/");
 }

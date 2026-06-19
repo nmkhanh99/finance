@@ -73,9 +73,12 @@ export interface RefreshResult {
   error?: string;
 }
 
-/** Cập nhật giá thị trường cho mọi holding crypto -> ghi PriceSnapshot. Không ném lỗi. */
-export async function refreshCryptoPrices(): Promise<RefreshResult> {
-  const holdings = await prisma.holding.findMany({ where: { assetType: "CRYPTO" } });
+/** Cập nhật giá thị trường cho holding crypto -> ghi PriceSnapshot. Không ném lỗi.
+ *  userId: truyền -> chỉ holding của user đó; bỏ trống -> mọi user (cron). */
+export async function refreshCryptoPrices(userId?: string): Promise<RefreshResult> {
+  const holdings = await prisma.holding.findMany({
+    where: { assetType: "CRYPTO", ...(userId ? { userId } : {}) },
+  });
   const idBySymbol: Record<string, string> = {};
   const skipped: string[] = [];
   for (const h of holdings) {
@@ -105,9 +108,12 @@ export async function refreshCryptoPrices(): Promise<RefreshResult> {
   }
 }
 
-/** Cập nhật giá cho mọi holding chứng khoán VN -> ghi PriceSnapshot. Không ném lỗi. */
-export async function refreshStockPrices(): Promise<RefreshResult> {
-  const holdings = await prisma.holding.findMany({ where: { assetType: "STOCK" } });
+/** Cập nhật giá cho holding chứng khoán VN -> ghi PriceSnapshot. Không ném lỗi.
+ *  userId: truyền -> chỉ holding của user đó; bỏ trống -> mọi user (cron). */
+export async function refreshStockPrices(userId?: string): Promise<RefreshResult> {
+  const holdings = await prisma.holding.findMany({
+    where: { assetType: "STOCK", ...(userId ? { userId } : {}) },
+  });
   if (holdings.length === 0) return { updated: 0, skipped: [] };
 
   const skipped: string[] = [];
@@ -130,9 +136,10 @@ export async function refreshStockPrices(): Promise<RefreshResult> {
   }
 }
 
-/** Cập nhật cả crypto (CoinGecko) lẫn chứng khoán VN (VNDirect). */
-export async function refreshAllPrices(): Promise<RefreshResult> {
-  const [c, s] = await Promise.all([refreshCryptoPrices(), refreshStockPrices()]);
+/** Cập nhật cả crypto (CoinGecko) lẫn chứng khoán VN (VNDirect).
+ *  userId: truyền -> chỉ holding của user đó; bỏ trống -> mọi user (cron). */
+export async function refreshAllPrices(userId?: string): Promise<RefreshResult> {
+  const [c, s] = await Promise.all([refreshCryptoPrices(userId), refreshStockPrices(userId)]);
   return {
     updated: c.updated + s.updated,
     skipped: [...c.skipped, ...s.skipped],

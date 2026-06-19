@@ -1,10 +1,13 @@
 import { prisma } from "@/lib/db";
 import { createCategory, renameCategory, deleteCategory } from "./actions";
+import { requireUserId } from "@/lib/currentUser";
 
 export const dynamic = "force-dynamic";
 
 export default async function CategoriesPage() {
+  const userId = await requireUserId();
   const categories = await prisma.category.findMany({
+    where: { userId },
     orderBy: { name: "asc" },
     include: { _count: { select: { transactions: true } } },
   });

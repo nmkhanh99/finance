@@ -10,14 +10,19 @@ export default function LoginForm() {
     <form action={action} className="w-full max-w-sm space-y-4 rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-6">
       <h1 className="text-xl font-semibold">Đăng nhập</h1>
       <label className="flex flex-col text-sm">
-        <span className="mb-1 text-gray-500 dark:text-gray-400">Mật khẩu</span>
+        <span className="mb-1 text-gray-500 dark:text-gray-400">Tên đăng nhập</span>
         <input
-          name="password"
-          type="password"
+          name="username"
+          type="text"
           autoFocus
           required
+          autoComplete="username"
+          placeholder="vd: lam"
           className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2"
         />
+        <span className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          Chưa có sẽ tự tạo mới. (Bảo mật mật khẩu bổ sung sau.)
+        </span>
       </label>
       {state.error && <p className="text-sm text-red-400">{state.error}</p>}
       <button

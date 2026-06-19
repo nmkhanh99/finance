@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/currentUser";
 import { computeNetWorth } from "@/lib/networth";
 import { evaluateBudget } from "@/lib/budget";
 import { convertToBase } from "@/lib/currency";
@@ -25,26 +26,28 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
 }
 
 export default async function DashboardPage() {
+  const userId = await requireUserId();
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const monthRange = { gte: monthStart, lt: monthEnd };
 
   const [nwb, accountCount, monthTxs, budgets, recent, debts, goals, rates] = await Promise.all([
-    computeNetWorth(),
-    prisma.account.count(),
+    computeNetWorth(userId),
+    prisma.account.count({ where: { userId } }),
     prisma.transaction.findMany({
-      where: { date: monthRange, type: { in: ["INCOME", "EXPENSE"] } },
+      where: { userId, date: monthRange, type: { in: ["INCOME", "EXPENSE"] } },
       select: { type: true, amount: true, categoryId: true, account: { select: { currency: true } } },
     }),
-    prisma.budget.findMany(),
+    prisma.budget.findMany({ where: { userId } }),
     prisma.transaction.findMany({
+      where: { userId },
       orderBy: { date: "desc" },
       take: 5,
       include: { account: true, toAccount: true, category: true },
     }),
-    prisma.debt.findMany({ include: { payments: true } }),
-    prisma.goal.findMany(),
+    prisma.debt.findMany({ where: { userId }, include: { payments: true } }),
+    prisma.goal.findMany({ where: { userId } }),
     loadRates(),
   ]);
 

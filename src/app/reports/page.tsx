@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/currentUser";
 import { formatMoney } from "@/lib/format";
 import { simulatePayoff, amortizingMonthlyPayment, type DebtForSim } from "@/lib/finance";
 import { convertToBase } from "@/lib/currency";
@@ -21,12 +22,13 @@ export default async function ReportsPage({
 }: {
   searchParams: Promise<{ extra?: string }>;
 }) {
+  const userId = await requireUserId();
   const sp = await searchParams;
   const extra = Math.max(Number(sp.extra ?? 0) || 0, 0);
   const rates = await loadRates(); // số tiền quy đổi về VND theo tiền tệ tài khoản
 
   // ----- Net Worth theo thời gian (snapshot) -----
-  const snapshots = await prisma.netWorthSnapshot.findMany({ orderBy: { date: "asc" }, take: 180 });
+  const snapshots = await prisma.netWorthSnapshot.findMany({ where: { userId }, orderBy: { date: "asc" }, take: 180 });
   const nwSeries: NetWorthPoint[] = snapshots.map((s) => ({
     date: `${s.date.getUTCDate()}/${s.date.getUTCMonth() + 1}`,
     netWorth: Number(s.netWorth),
@@ -37,7 +39,7 @@ export default async function ReportsPage({
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const txs = await prisma.transaction.findMany({
-    where: { date: { gte: monthStart, lt: monthEnd }, type: { in: ["INCOME", "EXPENSE"] } },
+    where: { userId, date: { gte: monthStart, lt: monthEnd }, type: { in: ["INCOME", "EXPENSE"] } },
     include: { category: true, account: { select: { currency: true } } },
   });
 
@@ -60,7 +62,7 @@ export default async function ReportsPage({
   // ----- Dòng tiền 6 tháng gần nhất (cho biểu đồ) -----
   const chartStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
   const recentTxs = await prisma.transaction.findMany({
-    where: { date: { gte: chartStart, lt: monthEnd }, type: { in: ["INCOME", "EXPENSE"] } },
+    where: { userId, date: { gte: chartStart, lt: monthEnd }, type: { in: ["INCOME", "EXPENSE"] } },
     select: { type: true, amount: true, date: true, account: { select: { currency: true } } },
   });
   const months: MonthPoint[] = [];
@@ -81,7 +83,7 @@ export default async function ReportsPage({
   }
 
   // ----- Trả nợ: Avalanche vs Snowball -----
-  const debts = await prisma.debt.findMany({ include: { payments: true } });
+  const debts = await prisma.debt.findMany({ where: { userId }, include: { payments: true } });
   const simDebts: DebtForSim[] = debts.map((d) => {
     const principal = Number(d.principal);
     const rate = Number(d.interestRate);

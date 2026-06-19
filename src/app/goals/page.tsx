@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { formatMoney, formatDate } from "@/lib/format";
 import { requiredMonthlySaving } from "@/lib/finance";
+import { requireUserId } from "@/lib/currentUser";
 import { createGoal, updateSaved, deleteGoal } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +16,8 @@ function monthsUntil(target: Date): number {
 }
 
 export default async function GoalsPage() {
-  const goals = await prisma.goal.findMany({ orderBy: { targetDate: "asc" } });
+  const userId = await requireUserId();
+  const goals = await prisma.goal.findMany({ where: { userId }, orderBy: { targetDate: "asc" } });
 
   return (
     <div className="space-y-8">

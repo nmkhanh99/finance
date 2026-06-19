@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/format";
 import { convertToBase } from "@/lib/currency";
+import { requireUserId } from "@/lib/currentUser";
 import { createAccount, updateBalance, deleteAccount } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -8,8 +9,9 @@ export const dynamic = "force-dynamic";
 const TYPE_LABEL: Record<string, string> = { CASH: "Tiền mặt", BANK: "Ngân hàng" };
 
 export default async function AccountsPage() {
+  const userId = await requireUserId();
   const [accounts, rateRows] = await Promise.all([
-    prisma.account.findMany({ orderBy: { createdAt: "asc" } }),
+    prisma.account.findMany({ where: { userId }, orderBy: { createdAt: "asc" } }),
     prisma.exchangeRate.findMany(),
   ]);
   const rates: Record<string, number> = {};

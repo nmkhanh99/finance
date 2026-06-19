@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { formatMoney, formatDate } from "@/lib/format";
 import { unrealizedPnL } from "@/lib/finance";
 import { convertToBase } from "@/lib/currency";
+import { requireUserId } from "@/lib/currentUser";
 import { createHolding, updatePrice, deleteHolding, refreshPrices } from "./actions";
 import PriceChart, { type PricePoint } from "./PriceChart";
 
@@ -19,9 +20,11 @@ export default async function InvestmentsPage({
 }: {
   searchParams: Promise<{ updated?: string; skipped?: string; error?: string; symbol?: string }>;
 }) {
+  const userId = await requireUserId();
   const sp = await searchParams;
   const [holdings, rateRows] = await Promise.all([
     prisma.holding.findMany({
+      where: { userId },
       orderBy: { createdAt: "asc" },
       include: { prices: { orderBy: { at: "desc" }, take: 1 } },
     }),
@@ -34,7 +37,7 @@ export default async function InvestmentsPage({
   const selected = holdings.find((h) => h.symbol === sp.symbol) ?? holdings[0];
   const history = selected
     ? await prisma.priceSnapshot.findMany({
-        where: { holdingId: selected.id },
+        where: { holdingId: selected.id, holding: { userId } },
         orderBy: { at: "asc" },
         take: 200,
       })

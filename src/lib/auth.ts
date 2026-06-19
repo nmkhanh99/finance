@@ -1,7 +1,9 @@
 /**
- * Auth tối giản cho app self-host single-user — KHÔNG thêm dependency.
- * Cookie phiên = `${exp}.${HMAC-SHA256(secret, exp)}` (Web Crypto, chạy cả Edge & Node).
- * Bật khi đặt env AUTH_PASSWORD; nếu không, auth tắt (giữ tương thích chạy local).
+ * Auth tối giản cho app self-host — KHÔNG thêm dependency.
+ * Cookie phiên ký HMAC-SHA256 (Web Crypto, chạy cả Edge & Node), payload mang `userId`.
+ * Hiện đăng nhập bằng username (chưa mật khẩu). Để cắm Keycloak/OIDC sau, chỉ cần đổi
+ * lớp resolve user (xem `lib/currentUser.ts`) — phần ký/đọc cookie ở đây giữ nguyên.
+ * Tham số `secret` để ký: env AUTH_SECRET (khuyến nghị đặt khi deploy).
  */
 
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 ngày
@@ -68,24 +70,45 @@ export function verifyPassword(input: string, expected: string): boolean {
   return expected.length > 0 && timingSafeEqual(input, expected);
 }
 
-// ----- Wrapper đọc env -----
+// ----- Session mang userId (multi-user) -----
+// payload = `${userId}.${exp}` (userId là cuid, không chứa dấu chấm). Ký HMAC như trên.
 
-export function authEnabled(): boolean {
-  return !!process.env.AUTH_PASSWORD;
+export async function createUserSession(
+  userId: string,
+  secret: string,
+  now = Date.now(),
+  ttl = SESSION_TTL_MS,
+): Promise<string> {
+  return signToken(`${userId}.${now + ttl}`, secret);
 }
+
+/** Trả userId nếu token hợp lệ & còn hạn, ngược lại null. */
+export async function readUserSession(
+  token: string | undefined,
+  secret: string,
+  now = Date.now(),
+): Promise<string | null> {
+  if (!token) return null;
+  const payload = await verifyToken(token, secret);
+  if (!payload) return null;
+  const dot = payload.lastIndexOf(".");
+  if (dot <= 0) return null;
+  const userId = payload.slice(0, dot);
+  const exp = Number(payload.slice(dot + 1));
+  if (!userId || !Number.isFinite(exp) || exp <= now) return null;
+  return userId;
+}
+
+// ----- Wrapper đọc env -----
 
 function secret(): string {
   return process.env.AUTH_SECRET || process.env.AUTH_PASSWORD || "dev-insecure-secret";
 }
 
-export function createSessionCookie(): Promise<string> {
-  return createSession(secret());
+export function createUserSessionCookie(userId: string): Promise<string> {
+  return createUserSession(userId, secret());
 }
 
-export function sessionValid(token: string | undefined): Promise<boolean> {
-  return isSessionValid(token, secret());
-}
-
-export function checkPassword(input: string): boolean {
-  return verifyPassword(input, process.env.AUTH_PASSWORD ?? "");
+export function readUserSessionId(token: string | undefined): Promise<string | null> {
+  return readUserSession(token, secret());
 }

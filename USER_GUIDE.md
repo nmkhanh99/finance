@@ -31,9 +31,11 @@ Mở app tại **http://localhost:3000**. Thanh điều hướng trên cùng có
 - **Net Worth**, **tổng tài khoản/đầu tư**, **dòng tiền (Báo cáo & Dashboard)** và **ngân sách** đều **quy đổi mọi tiền tệ về VND** theo tỷ giá. Số dư/giá từng dòng vẫn hiển thị theo tiền tệ gốc của nó.
 
 ## Đăng nhập & bảo mật
-- Mặc định app **không yêu cầu đăng nhập** (tiện chạy local một mình).
-- Để **bật bảo vệ bằng mật khẩu**: đặt biến môi trường `AUTH_PASSWORD` (và nên đặt `AUTH_SECRET`) — xem `.env.example`. Khi bật, mọi trang yêu cầu đăng nhập tại `/login`; có nút **Đăng xuất** ở thanh trên.
-- **Nên bật trước khi đưa app lên mạng** vì đây là dữ liệu tài chính nhạy cảm.
+- Mở app sẽ tới màn **Đăng nhập**: nhập **tên đăng nhập (username)**. Nếu chưa có, hệ thống **tự tạo tài khoản mới** (kèm sẵn danh mục thu/chi). Chưa cần mật khẩu.
+- Mỗi username có **dữ liệu riêng biệt** (tài khoản, giao dịch, đầu tư, nợ, mục tiêu, ngân sách, nhóm chia tiền) — người này không thấy dữ liệu người kia.
+- Thanh trên hiện **@tên-của-bạn** và nút **Đăng xuất**. Đăng nhập lại bằng đúng username để xem lại dữ liệu của mình.
+- Dữ liệu cũ (trước khi có nhiều tài khoản) nằm ở username **`default`** — đăng nhập `default` để xem.
+- **Lưu ý bảo mật:** hiện chưa có mật khẩu, nên chỉ phù hợp chạy local/tin cậy. Lớp bảo mật đăng nhập thật (Keycloak) sẽ bổ sung sau; **đừng đưa app lên mạng công khai khi chưa có mật khẩu** vì đây là dữ liệu tài chính nhạy cảm.
 
 ## Giao dịch định kỳ
 1. Vào **Định kỳ**.

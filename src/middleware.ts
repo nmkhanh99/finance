@@ -1,20 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { authEnabled, sessionValid, SESSION_COOKIE } from "@/lib/auth";
+import { readUserSessionId, SESSION_COOKIE } from "@/lib/auth";
 
 export async function middleware(req: NextRequest) {
-  if (!authEnabled()) return NextResponse.next(); // auth tắt khi chưa đặt AUTH_PASSWORD
-
   const { pathname, searchParams } = req.nextUrl;
   if (pathname === "/login") return NextResponse.next();
 
-  // Cron: cho phép /api/* nếu ?key=CRON_SECRET khớp
+  // Cron: cho phép /api/* nếu ?key=CRON_SECRET khớp (chạy đa người dùng, không cần phiên).
   const cronSecret = process.env.CRON_SECRET;
   if (pathname.startsWith("/api/") && cronSecret && searchParams.get("key") === cronSecret) {
     return NextResponse.next();
   }
 
-  if (await sessionValid(req.cookies.get(SESSION_COOKIE)?.value)) return NextResponse.next();
+  // Yêu cầu phiên hợp lệ (cookie ký HMAC mang userId). Không truy vấn DB ở Edge.
+  if (await readUserSessionId(req.cookies.get(SESSION_COOKIE)?.value)) {
+    return NextResponse.next();
+  }
 
   if (pathname.startsWith("/api/")) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });

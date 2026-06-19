@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/currentUser";
 import { buildTransactionWhere, type TxFilters } from "@/lib/txFilter";
 import { toCsv } from "@/lib/csv";
 
@@ -8,6 +9,7 @@ const TYPE_LABEL: Record<string, string> = { INCOME: "Thu", EXPENSE: "Chi", TRAN
 
 /** Xuất giao dịch ra CSV theo cùng bộ lọc của trang Giao dịch. */
 export async function GET(req: Request) {
+  const userId = await requireUserId();
   const sp = new URL(req.url).searchParams;
   const f: TxFilters = {
     q: sp.get("q") ?? undefined,
@@ -18,7 +20,7 @@ export async function GET(req: Request) {
   };
 
   const txs = await prisma.transaction.findMany({
-    where: buildTransactionWhere(f),
+    where: { ...buildTransactionWhere(f), userId },
     orderBy: { date: "desc" },
     include: { account: true, toAccount: true, category: true },
   });

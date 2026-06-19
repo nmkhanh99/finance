@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { formatMoney, formatDate } from "@/lib/format";
 import { createTransaction, deleteTransaction } from "./actions";
 import { buildTransactionWhere, type TxFilters } from "@/lib/txFilter";
+import { requireUserId } from "@/lib/currentUser";
 
 export const dynamic = "force-dynamic";
 
@@ -16,16 +17,18 @@ export default async function TransactionsPage({
 }: {
   searchParams: Promise<TxFilters>;
 }) {
+  const userId = await requireUserId();
   const f = await searchParams;
-  const where = buildTransactionWhere(f);
-  const hasFilter = Object.keys(where).length > 0;
+  const filterWhere = buildTransactionWhere(f);
+  const hasFilter = Object.keys(filterWhere).length > 0;
+  const where = { ...filterWhere, userId };
   const exportQs = new URLSearchParams(
     Object.entries(f).filter(([, v]) => v) as [string, string][],
   ).toString();
 
   const [accounts, categories, transactions, agg] = await Promise.all([
-    prisma.account.findMany({ orderBy: { name: "asc" } }),
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    prisma.account.findMany({ where: { userId }, orderBy: { name: "asc" } }),
+    prisma.category.findMany({ where: { userId }, orderBy: { name: "asc" } }),
     prisma.transaction.findMany({
       where,
       orderBy: { date: "desc" },

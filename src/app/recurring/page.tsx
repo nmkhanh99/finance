@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/currentUser";
 import { formatMoney, formatDate } from "@/lib/format";
 import {
   createRecurring,
@@ -16,11 +17,13 @@ const FREQ_LABEL: Record<string, string> = { DAILY: "Hằng ngày", WEEKLY: "H�
 const toInputDate = (d: Date) => d.toISOString().slice(0, 10);
 
 export default async function RecurringPage() {
+  const userId = await requireUserId();
   const now = new Date();
   const [accounts, categories, items] = await Promise.all([
-    prisma.account.findMany({ orderBy: { name: "asc" } }),
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    prisma.account.findMany({ where: { userId }, orderBy: { name: "asc" } }),
+    prisma.category.findMany({ where: { userId }, orderBy: { name: "asc" } }),
     prisma.recurringTransaction.findMany({
+      where: { userId },
       orderBy: { nextRun: "asc" },
       include: { account: true, toAccount: true, category: true },
     }),

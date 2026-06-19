@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/currentUser";
 import { formatMoney } from "@/lib/format";
 import { createGroup } from "./actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function TripsPage() {
+  const userId = await requireUserId();
   const groups = await prisma.tripGroup.findMany({
+    where: { userId },
     orderBy: { createdAt: "desc" },
     include: {
       members: true,

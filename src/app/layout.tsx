@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
-import { authEnabled } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { getCurrentUserId } from "@/lib/currentUser";
 import { logout } from "./login/actions";
 import ThemeToggle from "./ThemeToggle";
 
@@ -29,7 +30,9 @@ const NAV = [
   { href: "/trips", label: "Chia tiền nhóm" },
 ];
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const userId = await getCurrentUserId();
+  const user = userId ? await prisma.user.findUnique({ where: { id: userId }, select: { username: true } }) : null;
   return (
     <html lang="vi" suppressHydrationWarning>
       <head>
@@ -51,12 +54,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ))}
               <div className="ml-auto flex items-center gap-1">
                 <ThemeToggle />
-                {authEnabled() && (
-                  <form action={logout}>
-                    <button className="rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-black/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white">
-                      Đăng xuất
-                    </button>
-                  </form>
+                {user && (
+                  <>
+                    <span className="px-2 text-sm text-gray-500 dark:text-gray-400" title="Đang đăng nhập">
+                      @{user.username}
+                    </span>
+                    <form action={logout}>
+                      <button className="rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-black/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white">
+                        Đăng xuất
+                      </button>
+                    </form>
+                  </>
                 )}
               </div>
             </nav>

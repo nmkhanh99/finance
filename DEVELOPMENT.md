@@ -32,8 +32,10 @@ src/
     finance.ts          # công thức tài chính (Net Worth, P&L, lãi, FV, payoff)
     split.ts            # chia tiền nhóm + phương án thanh toán
     budget.ts           # đánh giá ngân sách (spent vs limit)
-    auth.ts             # ký/verify cookie phiên HMAC (Web Crypto), kiểm mật khẩu
-    networth.ts         # computeNetWorth + recordNetWorthSnapshot (Dashboard tái dùng)
+    auth.ts             # ký/verify cookie phiên HMAC (Web Crypto), mang userId
+    currentUser.ts      # getCurrentUserId/requireUserId — SEAM resolve user (đổi 1 chỗ khi cắm IdP)
+    userSetup.ts        # seedDefaultCategories — seed danh mục cho user mới
+    networth.ts         # computeNetWorth(userId) + recordNetWorthSnapshot(userId)
     txCore.ts           # applyTransaction — tạo giao dịch + cập nhật số dư (dùng chung)
     recurring.ts        # nextOccurrence (tần suất, pure)
     recurringRun.ts     # runDueRecurring — sinh giao dịch định kỳ tới hạn
@@ -93,7 +95,10 @@ Quy ước: **viết test cho công thức tài chính trước khi làm UI**. M
 ## 8. Database schema / data model
 PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 
-**Tài chính cá nhân:**
+**Người dùng:**
+- `User` (username unique, externalId? — để map IdP/Keycloak sau). Mọi bảng cá nhân bên dưới có `userId` (FK, onDelete Cascade); dữ liệu cách ly theo user. `ExchangeRate` là GLOBAL (không có userId).
+
+**Tài chính cá nhân (đều có `userId`):**
 - `Account` (CASH|BANK, balance, currency)
 - `Category` (INCOME|EXPENSE)
 - `Transaction` (INCOME|EXPENSE|TRANSFER, amount, date, accountId, toAccountId?, categoryId?)
@@ -101,7 +106,7 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 - `Debt` (principal, interestRate, SIMPLE|COMPOUND|AMORTIZING, termMonths, startDate) → `DebtPayment` (amount, principal, interest, date)
 - `Goal` (targetAmount, currentSaved, targetDate)
 - `Budget` (categoryId unique, limitAmount) — hạn mức chi/tháng theo danh mục
-- `NetWorthSnapshot` (date unique, totalCash/Invest/Debt, netWorth) — lịch sử Net Worth (1/ngày)
+- `NetWorthSnapshot` (unique [userId,date], totalCash/Invest/Debt, netWorth) — lịch sử Net Worth (1/ngày/user)
 - `RecurringTransaction` (type, amount, frequency, startDate, nextRun, endDate, active) — mẫu giao dịch định kỳ
 - `ExchangeRate` (code, rate) — tỷ giá quy đổi về VND (base); VND=1
 
@@ -137,7 +142,9 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 
 ## 12. Ghi chú bảo mật (dữ liệu tài chính cá nhân — nhạy cảm)
 - **`.env` đã `.gitignore`** — không commit `DATABASE_URL`/secret.
-- **Authentication (opt-in)**: đặt env `AUTH_PASSWORD` để bật đăng nhập 1 mật khẩu (single-user). Cookie phiên `fin_session` ký HMAC-SHA256 (Web Crypto, `src/lib/auth.ts`), httpOnly, 7 ngày; `src/middleware.ts` chặn mọi route trừ `/login`. `AUTH_SECRET` ký cookie; `CRON_SECRET` cho phép cron gọi `/api/*` qua `?key=`. Không đặt `AUTH_PASSWORD` ⇒ auth tắt (chạy local mở). **Bật auth trước khi deploy public.**
+- **Authentication (multi-user, BẮT BUỘC)**: đăng nhập bằng username (chưa có mật khẩu). Cookie phiên `fin_session` ký HMAC-SHA256 (Web Crypto, `src/lib/auth.ts`) mang `userId`, httpOnly, 7 ngày; `src/middleware.ts` chặn mọi route trừ `/login` (yêu cầu phiên hợp lệ). `AUTH_SECRET` ký cookie (nên đặt khi deploy); `CRON_SECRET` cho cron gọi `/api/*` qua `?key=`.
+- **Cách ly dữ liệu (IDOR)**: mọi query qua `requireUserId()` (`src/lib/currentUser.ts`) + filter `userId`; update/delete dùng `*Many` theo `{id,userId}` hoặc guard sở hữu; model con (PriceSnapshot/DebtPayment/Trip*) verify qua cha. **Mở rộng tính năng mới phải giữ pattern này.**
+- **Cắm bảo mật thật sau (Keycloak/OIDC)**: chỉ đổi thân `getCurrentUserId()` + map `User.externalId`; query không phải sửa. **Đặt mật khẩu/IdP trước khi deploy public.**
 - Không ghi dữ liệu tài chính thật, token, mật khẩu vào tài liệu/commit.
 - Khi deploy: cân nhắc mã hoá at-rest, dùng mật khẩu DB mạnh (mặc định Docker `finance/finance` chỉ cho local).
 - Disclaimer: app hỗ trợ theo dõi, không phải tư vấn đầu tư.
@@ -147,5 +154,5 @@ PostgreSQL, schema `finance`. Các model (xem `prisma/schema.prisma`):
 
 ## 14. Biến môi trường & cron
 - `DATABASE_URL` — kết nối Postgres (bắt buộc).
-- `AUTH_PASSWORD` — đặt để bật auth (bỏ trống = tắt). `AUTH_SECRET` — ký cookie phiên. `CRON_SECRET` — cho cron gọi `/api/*` qua `?key=`.
+- `AUTH_SECRET` — ký cookie phiên (bỏ trống = secret mặc định không an toàn, chỉ cho local). `CRON_SECRET` — cho cron gọi `/api/*` qua `?key=`. (Đăng nhập bằng username, không còn `AUTH_PASSWORD`.)
 - **Cron tự động (Docker):** service `cron` chạy `docker/cron.sh` (busybox crond) gọi `/api/prices/refresh` (15 phút), `/api/recurring/run`, `/api/networth/snapshot` & `/api/rates/refresh` (hằng ngày). Chạy thủ công ngoài Docker: đặt crontab gọi `curl` tới các endpoint đó (xem comment trong mỗi route).

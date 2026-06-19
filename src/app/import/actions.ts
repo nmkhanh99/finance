@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 import { parseCsv } from "@/lib/csvParse";
 import { validateImportRows } from "@/lib/importTx";
 import { applyTransaction } from "@/lib/txCore";
+import { requireUserId } from "@/lib/currentUser";
 
 export interface ImportResult {
   done: boolean;
@@ -18,6 +19,7 @@ export async function importTransactions(
   _prev: ImportResult,
   formData: FormData,
 ): Promise<ImportResult> {
+  const userId = await requireUserId();
   const file = formData.get("file") as File | null;
   let text = "";
   if (file && file.size > 0) text = await file.text();
@@ -26,8 +28,8 @@ export async function importTransactions(
 
   const rows = parseCsv(text);
   const [accounts, categories] = await Promise.all([
-    prisma.account.findMany({ select: { id: true, name: true } }),
-    prisma.category.findMany({ select: { id: true, name: true } }),
+    prisma.account.findMany({ where: { userId }, select: { id: true, name: true } }),
+    prisma.category.findMany({ where: { userId }, select: { id: true, name: true } }),
   ]);
 
   const { valid, errors } = validateImportRows(rows, accounts, categories);
@@ -35,7 +37,7 @@ export async function importTransactions(
   if (valid.length > 0) {
     await prisma.$transaction(async (tx) => {
       for (const v of valid) {
-        await applyTransaction(tx, { ...v, amount: new Prisma.Decimal(v.amount) });
+        await applyTransaction(tx, { ...v, amount: new Prisma.Decimal(v.amount), userId });
       }
     });
     revalidatePath("/transactions");

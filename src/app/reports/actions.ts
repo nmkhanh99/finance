@@ -2,9 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { recordNetWorthSnapshot } from "@/lib/networth";
+import { requireUserId } from "@/lib/currentUser";
 
 export async function snapshotNetWorth() {
-  await recordNetWorthSnapshot();
+  const userId = await requireUserId();
+  await recordNetWorthSnapshot(userId);
   revalidatePath("/reports");
   revalidatePath("/");
 }

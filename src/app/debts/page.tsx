@@ -6,6 +6,7 @@ import {
   simpleInterest,
   compoundBalance,
 } from "@/lib/finance";
+import { requireUserId } from "@/lib/currentUser";
 import { createDebt, addPayment, deleteDebt } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +35,9 @@ function summarize(principal: number, rate: number, termMonths: number, type: st
 }
 
 export default async function DebtsPage() {
+  const userId = await requireUserId();
   const debts = await prisma.debt.findMany({
+    where: { userId },
     orderBy: { createdAt: "asc" },
     include: { payments: { orderBy: { date: "desc" } } },
   });

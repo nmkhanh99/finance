@@ -8,9 +8,10 @@ const MAX_CATCH_UP = 366; // chặn vòng lặp vô hạn nếu nextRun quá cũ
  * Sinh các giao dịch định kỳ đã tới hạn (nextRun <= now), có "đuổi kịp" nhiều kỳ.
  * Cập nhật nextRun; tự tắt (active=false) khi vượt endDate. Trả số giao dịch đã tạo.
  */
-export async function runDueRecurring(now: Date = new Date()): Promise<{ created: number }> {
+// userId: nếu truyền -> chỉ chạy recurring của user đó (nút "Chạy ngay"); bỏ trống -> mọi user (cron).
+export async function runDueRecurring(now: Date = new Date(), userId?: string): Promise<{ created: number }> {
   const due = await prisma.recurringTransaction.findMany({
-    where: { active: true, nextRun: { lte: now } },
+    where: { active: true, nextRun: { lte: now }, ...(userId ? { userId } : {}) },
   });
 
   let created = 0;
@@ -28,6 +29,7 @@ export async function runDueRecurring(now: Date = new Date()): Promise<{ created
           accountId: r.accountId,
           toAccountId: r.toAccountId,
           categoryId: r.categoryId,
+          userId: r.userId,
         });
         created++;
         cursor = nextOccurrence(cursor, r.frequency);

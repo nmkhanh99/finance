@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/currentUser";
 import { formatMoney, formatDate } from "@/lib/format";
 import { settle, type Balance } from "@/lib/split";
 import { addMember, deleteMember, deleteExpense, deleteGroup } from "../actions";
@@ -9,9 +10,10 @@ import ExpenseForm from "./ExpenseForm";
 export const dynamic = "force-dynamic";
 
 export default async function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const userId = await requireUserId();
   const { id } = await params;
-  const group = await prisma.tripGroup.findUnique({
-    where: { id },
+  const group = await prisma.tripGroup.findFirst({
+    where: { id, userId },
     include: {
       members: { orderBy: { createdAt: "asc" } },
       expenses: {

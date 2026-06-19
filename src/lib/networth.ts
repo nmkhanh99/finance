@@ -10,12 +10,12 @@ export interface NetWorthBreakdown {
   netWorth: number;
 }
 
-/** Tính tài sản ròng hiện tại từ tài khoản + đầu tư (giá mới nhất) − dư nợ. */
-export async function computeNetWorth(): Promise<NetWorthBreakdown> {
+/** Tính tài sản ròng hiện tại từ tài khoản + đầu tư (giá mới nhất) − dư nợ của 1 user. */
+export async function computeNetWorth(userId: string): Promise<NetWorthBreakdown> {
   const [accounts, holdings, debts, rateRows] = await Promise.all([
-    prisma.account.findMany(),
-    prisma.holding.findMany({ include: { prices: { orderBy: { at: "desc" }, take: 1 } } }),
-    prisma.debt.findMany({ include: { payments: true } }),
+    prisma.account.findMany({ where: { userId } }),
+    prisma.holding.findMany({ where: { userId }, include: { prices: { orderBy: { at: "desc" }, take: 1 } } }),
+    prisma.debt.findMany({ where: { userId }, include: { payments: true } }),
     prisma.exchangeRate.findMany(),
   ]);
 
@@ -44,9 +44,9 @@ export async function computeNetWorth(): Promise<NetWorthBreakdown> {
   return { totalCash, totalInvest, totalDebt, netWorth: nw };
 }
 
-/** Ghi lại snapshot Net Worth cho hôm nay (1 bản/ngày, upsert). Trả về breakdown. */
-export async function recordNetWorthSnapshot(): Promise<NetWorthBreakdown> {
-  const b = await computeNetWorth();
+/** Ghi lại snapshot Net Worth hôm nay cho 1 user (1 bản/ngày, upsert). Trả về breakdown. */
+export async function recordNetWorthSnapshot(userId: string): Promise<NetWorthBreakdown> {
+  const b = await computeNetWorth(userId);
   const now = new Date();
   // UTC midnight để cột @db.Date lưu đúng ngày, không bị lệch múi giờ
   const day = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
@@ -57,8 +57,8 @@ export async function recordNetWorthSnapshot(): Promise<NetWorthBreakdown> {
     netWorth: new Prisma.Decimal(b.netWorth),
   };
   await prisma.netWorthSnapshot.upsert({
-    where: { date: day },
-    create: { date: day, ...data },
+    where: { userId_date: { userId, date: day } },
+    create: { userId, date: day, ...data },
     update: data,
   });
   return b;
