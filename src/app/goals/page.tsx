@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { formatMoney, formatDate } from "@/lib/format";
 import { requiredMonthlySaving } from "@/lib/finance";
 import { requireUserId } from "@/lib/currentUser";
+import MoneyInput from "../MoneyInput";
 import { createGoal, updateSaved, deleteGoal } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -34,11 +35,11 @@ export default async function GoalsPage() {
         </label>
         <label className="flex flex-col text-sm">
           <span className="mb-1 text-gray-500 dark:text-gray-400">Số tiền cần (VND)</span>
-          <input name="targetAmount" type="number" step="1000" min="0" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
+          <MoneyInput name="targetAmount" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
         <label className="flex flex-col text-sm">
           <span className="mb-1 text-gray-500 dark:text-gray-400">Đã có (VND)</span>
-          <input name="currentSaved" type="number" step="1000" min="0" defaultValue={0} className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
+          <MoneyInput name="currentSaved" defaultValue={0} className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
         <label className="flex flex-col text-sm">
           <span className="mb-1 text-gray-500 dark:text-gray-400">Hạn đạt được</span>
@@ -105,7 +106,7 @@ export default async function GoalsPage() {
                 <input type="hidden" name="id" value={g.id} />
                 <label className="flex flex-col text-xs">
                   <span className="mb-1 text-gray-500 dark:text-gray-400">Cập nhật số đã có</span>
-                  <input name="currentSaved" type="number" step="1000" min="0" defaultValue={saved} className="w-44 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-1.5" />
+                  <MoneyInput name="currentSaved" defaultValue={saved} className="w-44 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-1.5" />
                 </label>
                 <button className="rounded-lg border border-black/15 dark:border-white/15 px-3 py-1.5 text-sm hover:bg-black/5 dark:hover:bg-white/10">Lưu</button>
               </form>

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/currentUser";
 import { formatMoney, formatDate } from "@/lib/format";
+import MoneyInput from "../MoneyInput";
 import {
   createRecurring,
   deleteRecurring,
@@ -61,7 +62,7 @@ export default async function RecurringPage() {
           </label>
           <label className="flex flex-col text-sm">
             <span className="mb-1 text-gray-500 dark:text-gray-400">Số tiền (VND)</span>
-            <input name="amount" type="number" step="1000" min="0" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
+            <MoneyInput name="amount" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
           </label>
           <label className="flex flex-col text-sm">
             <span className="mb-1 text-gray-500 dark:text-gray-400">Tần suất</span>
@@ -145,7 +146,7 @@ export default async function RecurringPage() {
                 <input type="hidden" name="id" value={r.id} />
                 <label className="flex flex-col text-xs">
                   <span className="mb-1 text-gray-500 dark:text-gray-400">Số tiền</span>
-                  <input name="amount" type="number" step="1000" min="0" defaultValue={Number(r.amount)} className="w-32 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-2 py-1" />
+                  <MoneyInput name="amount" defaultValue={Number(r.amount)} className="w-32 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-2 py-1" />
                 </label>
                 <label className="flex flex-col text-xs">
                   <span className="mb-1 text-gray-500 dark:text-gray-400">Tần suất</span>

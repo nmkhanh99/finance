@@ -3,6 +3,7 @@ import { requireUserId } from "@/lib/currentUser";
 import { formatMoney } from "@/lib/format";
 import { simulatePayoff, toDebtForSim, type DebtForSim } from "@/lib/finance";
 import { monthStartUTC } from "@/lib/dateOnly";
+import MoneyInput from "../MoneyInput";
 import { convertToBase } from "@/lib/currency";
 import { loadRates } from "@/lib/rates";
 import CashFlowChart, { type MonthPoint } from "./CashFlowChart";
@@ -190,11 +191,8 @@ export default async function ReportsPage({
             <form method="get" className="flex flex-wrap items-end gap-3 rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4">
               <label className="flex flex-col text-sm">
                 <span className="mb-1 text-gray-500 dark:text-gray-400">Số tiền trả thêm mỗi tháng (ngoài mức tối thiểu)</span>
-                <input
+                <MoneyInput
                   name="extra"
-                  type="number"
-                  step="100000"
-                  min="0"
                   defaultValue={extra}
                   className="w-56 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2"
                 />

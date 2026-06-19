@@ -3,6 +3,7 @@ import { formatMoney, formatDate } from "@/lib/format";
 import { createTransaction, deleteTransaction } from "./actions";
 import { buildTransactionWhere, type TxFilters } from "@/lib/txFilter";
 import { requireUserId } from "@/lib/currentUser";
+import MoneyInput from "../MoneyInput";
 
 export const dynamic = "force-dynamic";
 
@@ -67,11 +68,8 @@ export default async function TransactionsPage({
           </label>
           <label className="flex flex-col text-sm">
             <span className="mb-1 text-gray-500 dark:text-gray-400">Số tiền (VND)</span>
-            <input
+            <MoneyInput
               name="amount"
-              type="number"
-              step="1000"
-              min="0"
               required
               className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2"
             />

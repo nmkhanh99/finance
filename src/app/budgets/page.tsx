@@ -5,6 +5,7 @@ import { convertToBase } from "@/lib/currency";
 import { loadRates } from "@/lib/rates";
 import { monthStartUTC } from "@/lib/dateOnly";
 import { requireUserId } from "@/lib/currentUser";
+import MoneyInput from "../MoneyInput";
 import { setBudget } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -82,11 +83,8 @@ export default async function BudgetsPage() {
                   <form action={setBudget} className="flex items-center gap-2">
                     <input type="hidden" name="categoryId" value={c.id} />
                     <span className="text-xs text-gray-500 dark:text-gray-400">Hạn mức/tháng</span>
-                    <input
+                    <MoneyInput
                       name="limitAmount"
-                      type="number"
-                      step="10000"
-                      min="0"
                       defaultValue={hasBudget ? limit : ""}
                       placeholder="0"
                       className="w-36 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-1.5 text-right text-sm"

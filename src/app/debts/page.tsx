@@ -7,6 +7,7 @@ import {
   compoundBalance,
 } from "@/lib/finance";
 import { requireUserId } from "@/lib/currentUser";
+import MoneyInput from "../MoneyInput";
 import { createDebt, addPayment, deleteDebt } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -72,11 +73,11 @@ export default async function DebtsPage() {
         </label>
         <label className="flex flex-col text-sm">
           <span className="mb-1 text-gray-500 dark:text-gray-400">Gốc (VND)</span>
-          <input name="principal" type="number" step="1000" min="0" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
+          <MoneyInput name="principal" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
         <label className="flex flex-col text-sm">
           <span className="mb-1 text-gray-500 dark:text-gray-400">Lãi suất (%/năm)</span>
-          <input name="ratePercent" type="number" step="0.1" min="0" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
+          <input name="ratePercent" type="number" step="any" min="0" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
         <label className="flex flex-col text-sm">
           <span className="mb-1 text-gray-500 dark:text-gray-400">Kỳ hạn (tháng)</span>
@@ -138,7 +139,7 @@ export default async function DebtsPage() {
                 <input type="hidden" name="debtId" value={d.id} />
                 <label className="flex flex-col text-xs">
                   <span className="mb-1 text-gray-500 dark:text-gray-400">Số tiền trả</span>
-                  <input name="amount" type="number" step="1000" min="0" required className="w-40 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-1.5" />
+                  <MoneyInput name="amount" required className="w-40 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-1.5" />
                 </label>
                 <label className="flex flex-col text-xs">
                   <span className="mb-1 text-gray-500 dark:text-gray-400">Ngày</span>

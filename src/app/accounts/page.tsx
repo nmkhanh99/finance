@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { formatMoney } from "@/lib/format";
 import { convertToBase } from "@/lib/currency";
 import { requireUserId } from "@/lib/currentUser";
+import MoneyInput from "../MoneyInput";
 import { createAccount, updateBalance, deleteAccount } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -50,10 +51,8 @@ export default async function AccountsPage() {
         </label>
         <label className="flex flex-col text-sm">
           <span className="mb-1 text-gray-500 dark:text-gray-400">Số dư</span>
-          <input
+          <MoneyInput
             name="balance"
-            type="number"
-            step="1000"
             defaultValue={0}
             className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2"
           />
@@ -89,10 +88,8 @@ export default async function AccountsPage() {
             <div className="flex items-center gap-2">
               <form action={updateBalance} className="flex items-center gap-2">
                 <input type="hidden" name="id" value={a.id} />
-                <input
+                <MoneyInput
                   name="balance"
-                  type="number"
-                  step="1000"
                   defaultValue={Number(a.balance)}
                   className="w-40 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-1.5 text-right"
                 />

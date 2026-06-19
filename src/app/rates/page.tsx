@@ -34,7 +34,7 @@ export default async function RatesPage() {
         </label>
         <label className="flex flex-col text-sm">
           <span className="mb-1 text-gray-500 dark:text-gray-400">= ? VND</span>
-          <input name="rate" type="number" step="0.000001" min="0" required placeholder="25000" className="w-40 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
+          <input name="rate" type="number" step="any" min="0" required placeholder="25000" className="w-40 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
         <button className="rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black hover:bg-emerald-400">Lưu tỷ giá</button>
       </form>

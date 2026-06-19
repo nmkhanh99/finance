@@ -116,7 +116,7 @@ export default function ExpenseForm({
       {mode === "EQUAL" && (
         <label className="flex flex-col text-sm sm:col-span-2">
           <span className="mb-1 text-gray-500 dark:text-gray-400">Tổng số tiền ({cur}) — chia đều cho người được chọn</span>
-          <input name="amount" type="number" step="1000" min="0" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
+          <input name="amount" type="number" step="any" min="0" required className="rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-3 py-2" />
         </label>
       )}
 
@@ -147,7 +147,7 @@ export default function ExpenseForm({
                   <input
                     name={`share_${m.id}`}
                     type="number"
-                    step="1000"
+                    step="any"
                     min="0"
                     placeholder="0"
                     className="w-24 rounded-md border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/30 px-2 py-1 text-right text-sm"
@@ -180,7 +180,7 @@ export default function ExpenseForm({
                 <input
                   name="payAmount"
                   type="number"
-                  step="1000"
+                  step="any"
                   min="0"
                   value={row.amount}
                   onChange={(e) => setRow(i, { amount: e.target.value })}
