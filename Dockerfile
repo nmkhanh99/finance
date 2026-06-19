@@ -5,7 +5,11 @@ FROM node:22-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+# Bền với rớt mạng tạm thời (ECONNRESET): tăng số lần retry + timeout khi tải package.
+RUN npm ci --no-audit --no-fund \
+  --fetch-retries=5 \
+  --fetch-retry-mintimeout=20000 \
+  --fetch-retry-maxtimeout=120000
 
 # ---- builder: generate Prisma + build Next (standalone) ----
 # Cũng dùng làm image chạy migration (có sẵn Prisma CLI + tsx + source).

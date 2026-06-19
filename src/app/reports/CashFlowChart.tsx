@@ -33,7 +33,7 @@ export default function CashFlowChart({ data }: { data: MonthPoint[] }) {
           <XAxis dataKey="month" tick={{ fill: "#9ca3af", fontSize: 12 }} />
           <YAxis tickFormatter={fmtShort} tick={{ fill: "#9ca3af", fontSize: 12 }} width={44} />
           <Tooltip
-            formatter={(v: number) => `${fmt(v)} ₫`}
+            formatter={(v) => `${fmt(Number(v))} ₫`}
             contentStyle={{ background: "#0b0f1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12 }}
             labelStyle={{ color: "#e6e9ef" }}
           />

@@ -33,7 +33,7 @@ export default function PriceChart({ data, symbol }: { data: PricePoint[]; symbo
           <XAxis dataKey="t" tick={{ fill: "#9ca3af", fontSize: 11 }} />
           <YAxis tickFormatter={fmtShort} tick={{ fill: "#9ca3af", fontSize: 11 }} width={52} domain={["auto", "auto"]} />
           <Tooltip
-            formatter={(v: number) => [`${fmt(v)} ₫`, symbol]}
+            formatter={(v) => [`${fmt(Number(v))} ₫`, symbol]}
             contentStyle={{ background: "#0b0f1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12 }}
             labelStyle={{ color: "#e6e9ef" }}
           />

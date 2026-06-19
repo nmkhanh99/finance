@@ -33,7 +33,7 @@ export default function NetWorthChart({ data }: { data: NetWorthPoint[] }) {
           <XAxis dataKey="date" tick={{ fill: "#9ca3af", fontSize: 12 }} />
           <YAxis tickFormatter={fmtShort} tick={{ fill: "#9ca3af", fontSize: 12 }} width={52} />
           <Tooltip
-            formatter={(v: number) => [`${fmt(v)} ₫`, "Net Worth"]}
+            formatter={(v) => [`${fmt(Number(v))} ₫`, "Net Worth"]}
             contentStyle={{ background: "#0b0f1a", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12 }}
             labelStyle={{ color: "#e6e9ef" }}
           />
